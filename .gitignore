@@ -338,3 +338,9 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+
+/ConsoleApp1
+packages
+ConsoleApp1.zip
+/Unused
+Unused
