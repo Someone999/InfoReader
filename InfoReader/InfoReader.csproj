@@ -123,11 +123,11 @@
     <Compile Include="I18n\Japanese.cs" />
     <Compile Include="I18n\SimplifiedChinese.cs" />
     <Compile Include="I18n\NI18n.cs" />
-    <Compile Include="MemoryMapWriter\ConstructorArgumentsInfo.cs" />
-    <Compile Include="MemoryMapWriter\ExpressionTools.cs" />
-    <Compile Include="MemoryMapWriter\ExpressionType.cs" />
-    <Compile Include="MemoryMapWriter\IfExpression.cs" />
-    <Compile Include="MemoryMapWriter\VariableExpression.cs" />
+    <Compile Include="ExpressionParser\ConstructorArgumentsInfo.cs" />
+    <Compile Include="ExpressionParser\ExpressionTools.cs" />
+    <Compile Include="ExpressionParser\ExpressionType.cs" />
+    <Compile Include="ExpressionParser\IfExpression.cs" />
+    <Compile Include="ExpressionParser\VariableExpression.cs" />
     <Compile Include="VariablePropertyInfo.cs" />
     <Compile Include="Window\MemFileMapFormat.cs">
       <SubType>Form</SubType>
@@ -185,7 +185,7 @@
   </PropertyGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties Reactor_Deploy="0" Reactor_Output="" Reactor_Configuration="ALL" Reactor_Project="" Reactor_Commands="" Reactor_Enabled="0" />
+      <UserProperties Reactor_Enabled="0" Reactor_Commands="" Reactor_Project="" Reactor_Configuration="ALL" Reactor_Output="" Reactor_Deploy="0" />
     </VisualStudio>
   </ProjectExtensions>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
