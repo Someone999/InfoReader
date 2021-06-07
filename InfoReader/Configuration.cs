@@ -10,7 +10,7 @@ namespace InfoReaderPlugin
     {
         bool _debug = false;
         internal string encoding = "utf-8";
-        public ConfigurationElement ApiKey { get; set; } = "fa2748650422c84d59e0e1d5021340b6c418f62f";
+        public ConfigurationElement ApiKey { get; set; } = "";
         [Bool]
         public ConfigurationElement DebugMode { get => _debug.ToString(); set => _debug = bool.Parse(value); }
         [Path]
