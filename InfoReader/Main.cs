@@ -108,8 +108,8 @@ namespace InfoReaderPlugin
             {
                 File.WriteAllBytes("RealTimePPDisplayer.dll", Resource1.ModifiedRealTimePPDisplayer);
             }
-            if(!File.Exists("bass.dll"))
-                File.WriteAllBytes("bass.dll",Resource1.bass);
+            /*if(!File.Exists("bass.dll"))
+                File.WriteAllBytes("bass.dll",Resource1.bass);*/
             
             _outputInfoMap = MemoryMappedFile.CreateOrOpen("InfoReaderMmf",128);
             EventBus.BindEvent<PluginEvents.InitPluginEvent>(Init);
