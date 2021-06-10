@@ -28,6 +28,10 @@ namespace InfoReaderPlugin.Command.CommandClasses
     {
         public string MainCommand => "var";
         public bool AutoCatch { get; set; } = true;
+        public bool OnUnhandledException(InfoReader instance, Exception exception)
+        {
+            return false;
+        }
         public string GetHelp() => NI18n.GetLanguageElement("LANG_HELP_VARGETTER") + "\n" + NI18n.GetLanguageElement("LANG_HELP_VARGUI");
         private VariableViewer _viewer;
         private bool _msgLoopStarted;

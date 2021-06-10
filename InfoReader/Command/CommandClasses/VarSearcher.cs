@@ -1,4 +1,5 @@
-﻿using InfoReaderPlugin.I18n;
+﻿using System;
+using InfoReaderPlugin.I18n;
 
 namespace InfoReaderPlugin.Command.CommandClasses
 {
@@ -6,6 +7,10 @@ namespace InfoReaderPlugin.Command.CommandClasses
     {
         public string MainCommand => "search";
         public bool AutoCatch { get; set; } = true;
+        public bool OnUnhandledException(InfoReader instance, Exception exception)
+        {
+            return false;
+        }
         public string GetHelp() => NI18n.GetLanguageElement("LANG_HELP_SEARCH");
 
         void Search(InfoReader infoReader, string varName)

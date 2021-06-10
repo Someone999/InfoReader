@@ -37,6 +37,16 @@ namespace InfoReaderPlugin
                     if (!p.AutoCatch)
                         throw new CommandProcessorException(NI18n.GetLanguageElement("LANG_ERR_PROCESSOREXCEPTION"), p,
                             ex);
+                    else
+                    {
+                       bool handled = p.OnUnhandledException(this, ex);
+                       if (!handled)
+                       {
+                           string notification = string.Format(NI18n.GetLanguageElement("LANG_ERR_UNHANDLEDEXCEPTION"),
+                               p.MainCommand, ex);
+                           IO.CurrentIO.WriteColor(notification,ConsoleColor.Red);
+                       }
+                    }
             }
             EventBus.RaiseEvent(new PEvent("getinfo"));
             return true;

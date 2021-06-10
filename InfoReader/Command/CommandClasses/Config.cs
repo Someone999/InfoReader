@@ -10,6 +10,11 @@ namespace InfoReaderPlugin.Command.CommandClasses
     {
         private readonly MemFileMapFormat _formatWindow = new MemFileMapFormat();
         private bool _msgLoopStarted;
+        public bool OnUnhandledException(InfoReader instance, Exception exception)
+        {
+            return false;
+        }
+
         public string MainCommand => "config";
         public bool AutoCatch { get; set; } = true;
         public string GetHelp() => NI18n.GetLanguageElement("LANG_HELP_MMFCONFIG");

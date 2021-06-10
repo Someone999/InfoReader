@@ -11,6 +11,10 @@ namespace InfoReaderPlugin.Command.CommandClasses
     class UrlOpener:ICommandProcessor
     {
         public bool AutoCatch { get; set; } = true;
+        public bool OnUnhandledException(InfoReader instance, Exception exception)
+        {
+            return false;
+        }
         public string MainCommand => "open";
         void Open(string url)
         {
@@ -22,18 +26,12 @@ namespace InfoReaderPlugin.Command.CommandClasses
             var or = instance.GetOrtdp();
             if (parser.MainCommand == "open")
             {
-                if (parser.Arguments[0] == "beatmap")
-                {
-                    if (parser.Arguments[1] == "page")
-                        Open(instance.GetOrtdp().Beatmap.DownloadLink);
-                    
-                }
-                else if (parser.Arguments[1] == "beatmapfolder")
+                if (parser.Arguments[0] == "beatmappage")
+                    Open(instance.GetOrtdp().Beatmap.DownloadLink);
+                else if (parser.Arguments[0] == "beatmapfolder")
                     Open(or.Beatmap.BeatmapFolder);
-
                 else if (parser.Arguments[0] == "musicfolder")
                     Open(instance.Setting.DefaultMusicCopyingDirectory);
-
                 else if (parser.Arguments[0] == "videofolder")
                     Open(instance.Setting.DefaultVideoCopyingDirectory);
 

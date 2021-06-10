@@ -11,6 +11,10 @@ namespace InfoReaderPlugin.Command.CommandClasses
     {
         public string MainCommand => "reinject";
         public bool AutoCatch { get; set; } = true;
+        public bool OnUnhandledException(InfoReader instance, Exception exception)
+        {
+            return false;
+        }
         public bool Process(InfoReader instance, CommandParser parser)
         {
             try

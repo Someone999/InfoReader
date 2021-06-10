@@ -55,6 +55,10 @@ namespace InfoReaderPlugin.Command.CommandClasses
 
         public string MainCommand => "get";
         public bool AutoCatch { get; set; } = true;
+        public bool OnUnhandledException(InfoReader instance, Exception exception)
+        {
+            return false;
+        }
         public string GetHelp() => NI18n.GetLanguageElement("LANG_HELP_FILEGETTER");
         string GetValidDir(string dir)
         {

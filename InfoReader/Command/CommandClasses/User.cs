@@ -12,6 +12,10 @@ namespace InfoReaderPlugin.Command.CommandClasses
     {
         public string MainCommand => "user";
         public bool AutoCatch { get; set; } = true;
+        public bool OnUnhandledException(InfoReader instance, Exception exception)
+        {
+            return false;
+        }
         bool IsModeString(string s,out int mode)
         {
             mode = -1;

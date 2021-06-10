@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using InfoReaderPlugin.I18n;
 using Sync.Tools;
 
@@ -8,6 +9,10 @@ namespace InfoReaderPlugin.Command.CommandClasses
     {
         public string MainCommand => "help";
         public bool AutoCatch { get; set; } = true;
+        public bool OnUnhandledException(InfoReader instance, Exception exception)
+        {
+            return false;
+        }
         private InfoReader _infoReader;
         public bool Process(InfoReader instance, CommandParser parser)
         {

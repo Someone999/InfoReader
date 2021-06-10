@@ -15,6 +15,10 @@ namespace InfoReaderPlugin.Command.CommandClasses
     {
         public string MainCommand => "list";
         public bool AutoCatch { get; set; } = true;
+        public bool OnUnhandledException(InfoReader instance, Exception exception)
+        {
+            return false;
+        }
         public bool Process(InfoReader infoReader,CommandParser parser)
         {
             Type t = infoReader.GetOrtdp().GetType();
