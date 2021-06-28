@@ -46,7 +46,7 @@ namespace InfoReaderPlugin.Command.CommandClasses
                     if(parser.Arguments.Count < 1)
                     {
                         OsuInfo info = new OsuInfo();
-                        username = info.UserName;
+                        username = info.LogonUserName;
                         if (string.IsNullOrEmpty(username))
                         {
                             IO.CurrentIO.WriteColor("无法检测用户名，请在最后填入用户名",ConsoleColor.Red);

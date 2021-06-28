@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
-namespace InfoReaderPlugin.MemoryMapWriter.ExpressionTools
+namespace InfoReaderPlugin.ExpressionParser
 {
     static class ExpressionTools
     {
@@ -393,6 +393,20 @@ namespace InfoReaderPlugin.MemoryMapWriter.ExpressionTools
             return val.ToString() != "Unknown Variable";
         }
 
+        public static bool IsNumber(string str,out double result)
+        {
+            result = 0;
+            string[] parts = str.Split('.');
+            if (parts.Length > 2)
+                return false;
+            double doubleResult = 0;
+            if (parts.Length > 1)
+                parts[1] = "0." + parts[1];
+            bool intSuc = int.TryParse(parts[0], out var intResult);
+            bool doubleSuc = parts.Length <= 1 || double.TryParse(parts[1], out doubleResult);
+            result = doubleResult + intResult;
+            return doubleSuc && intSuc;
+        }
         
     }
 }

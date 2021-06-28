@@ -1,6 +1,7 @@
 ﻿using System;
 using InfoReaderPlugin.Command;
 using InfoReaderPlugin.Command.CommandClasses;
+using InfoReaderPlugin.Exceptions;
 using InfoReaderPlugin.I18n;
 
 namespace InfoReaderPlugin
@@ -13,7 +14,7 @@ namespace InfoReaderPlugin
     {
         public bool GetInfo(Arguments args)
         {
-            Command.CommandParser parser = new Command.CommandParser(args);
+            CommandParser parser = new Command.CommandParser(args);
             ICommandProcessor processor = null;
             if (CommandProcessors.Processors.ContainsKey(parser.MainCommand))
                 processor = CommandProcessors[parser.MainCommand];

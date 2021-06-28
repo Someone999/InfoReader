@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Reflection;
 
-namespace InfoReaderPlugin.MemoryMapWriter
+namespace InfoReaderPlugin.ExpressionParser
 {
     public sealed class VariableExpression : ExpressionType
     {
@@ -42,6 +42,20 @@ namespace InfoReaderPlugin.MemoryMapWriter
         public override string Type => "Variable";
         public override object GetProcessedValue()
         {
+            if (ExpressionTools.IsNumber(NoFormatExpression, out double val))
+            {
+                try
+                {
+                    if (!string.IsNullOrEmpty(Format))
+                        return val.ToString(Format);
+                }
+                catch (FormatException)
+                {
+                    return ((int) val).ToString(Format);
+                }
+               
+                return val;
+            }
             string[] namePartial = NoFormatExpression.Split('.');            
             object t = Target;
             int match = 0;

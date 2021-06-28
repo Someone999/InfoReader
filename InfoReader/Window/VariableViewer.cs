@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Windows.Forms;
-using InfoReaderPlugin.MemoryMapWriter;
+using InfoReaderPlugin.ExpressionParser;
 using osuTools.Attributes;
 using osuTools.OrtdpWrapper;
 

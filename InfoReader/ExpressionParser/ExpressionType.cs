@@ -1,4 +1,4 @@
-﻿namespace InfoReaderPlugin.MemoryMapWriter
+﻿namespace InfoReaderPlugin.ExpressionParser
 {
     public abstract class ExpressionType
     {

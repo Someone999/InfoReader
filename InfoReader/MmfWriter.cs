@@ -1,10 +1,9 @@
 ﻿using System.Globalization;
 using System.Threading;
-using InfoReaderPlugin.MemoryMapWriter.ExpressionTools;
+using InfoReaderPlugin.ExpressionParser;
 
 namespace InfoReaderPlugin
 {
-    using InfoReaderPlugin.MemoryMapWriter;
     using System;
     using System.Text;
     using System.Text.RegularExpressions;

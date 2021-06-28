@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using InfoReaderPlugin.I18n;
-using InfoReaderPlugin.MemoryMapWriter;
 using osuTools;
 using osuTools.Attributes;
 using osuTools.Beatmaps;
@@ -156,6 +155,12 @@ namespace InfoReaderPlugin
             ThreadPool.QueueUserWorkItem(state => ConigFileWatcher());
             ThreadPool.QueueUserWorkItem(state => RefreshMmf());
         }
+
+        private void GetFunctions()
+        {
+
+        }
+
         private void GetAvaProperties(object obj)
         {
             

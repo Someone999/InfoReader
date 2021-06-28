@@ -1,4 +1,4 @@
-﻿namespace InfoReaderPlugin.MemoryMapWriter
+﻿namespace InfoReaderPlugin.ExpressionParser
 {
     public sealed class IfExpression:ExpressionType
     {
@@ -16,20 +16,20 @@
                 
                
                 string[] args = Expression.Remove(0, 4).Remove(len - 1, 1).Split(',');
-                var rpnExp = ExpressionTools.ExpressionTools.ConvertToRpnExpression(args[0]);
+                var rpnExp = ExpressionTools.ConvertToRpnExpression(args[0]);
                 TrueResult = args[1];
                 FalseResult = args[2];
                 if (!TrueResult.StartsWith("\"") && !TrueResult.EndsWith("\""))
                 {
-                    TrueResult = ExpressionTools.ExpressionTools.CalcRpnExpression(ExpressionTools.ExpressionTools.ConvertToRpnExpression(TrueResult),Target);
+                    TrueResult = ExpressionTools.CalcRpnExpression(ExpressionTools.ConvertToRpnExpression(TrueResult),Target);
                 }
                 else TrueResult = TrueResult.Trim('\"');
                 if (!FalseResult.StartsWith("\"") && !FalseResult.EndsWith("\""))
                 {
-                    FalseResult = ExpressionTools.ExpressionTools.CalcRpnExpression(ExpressionTools.ExpressionTools.ConvertToRpnExpression(FalseResult), Target);
+                    FalseResult = ExpressionTools.CalcRpnExpression(ExpressionTools.ConvertToRpnExpression(FalseResult), Target);
                 }
                 else FalseResult = FalseResult.Trim('\"');
-                if (bool.Parse(ExpressionTools.ExpressionTools.CalcRpnExpression(rpnExp, Target)))
+                if (bool.Parse(ExpressionTools.CalcRpnExpression(rpnExp, Target)))
                     return TrueResult;
                 return FalseResult;
             }

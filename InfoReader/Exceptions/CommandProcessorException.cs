@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using InfoReaderPlugin.Command.CommandClasses;
 using InfoReaderPlugin.I18n;
 using osuTools.Exceptions;
 
-namespace InfoReaderPlugin.Command
+namespace InfoReaderPlugin.Exceptions
 {
     public class CommandProcessorException:osuToolsExceptionBase
     {
