@@ -64,8 +64,8 @@ namespace InfoReaderPlugin.Command.CommandClasses
                             {
                                 IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_INFO_INJECTED"), ConsoleColor.DarkGreen);
                                 IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_INFO_RESTARTSYNC"), ConsoleColor.DarkGreen);
-                                System.Threading.Thread.Sleep(3000);
-                                Sync.SyncHost.Instance.RestartSync();
+                                //System.Threading.Thread.Sleep(3000);
+                                //Sync.SyncHost.Instance.RestartSync();
                                 return true;
                             }
                         }
@@ -87,17 +87,17 @@ namespace InfoReaderPlugin.Command.CommandClasses
                             if (module.ModuleName.ToUpper().Contains("Overlay.dll".ToUpper()))
                             {
                                 IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_INFO_INJECTED"), ConsoleColor.DarkGreen);
-                                IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_INFO_RESTARTSYNC"), ConsoleColor.DarkGreen);
-                                System.Threading.Thread.Sleep(3000);
-                                Sync.SyncHost.Instance.RestartSync();
+                                //IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_INFO_RESTARTSYNC"), ConsoleColor.DarkGreen);
+                                //System.Threading.Thread.Sleep(3000);
+                                //Sync.SyncHost.Instance.RestartSync();
                                 return true;
                             }
                         }
                     }
                     IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_INFO_INJECTED"), ConsoleColor.DarkGreen);
-                    IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_INFO_RESTARTSYNC"), ConsoleColor.DarkGreen);
-                    System.Threading.Thread.Sleep(3000);
-                    Sync.SyncHost.Instance.RestartSync();
+                    //IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_INFO_RESTARTSYNC"), ConsoleColor.DarkGreen);
+                    //System.Threading.Thread.Sleep(3000);
+                    //Sync.SyncHost.Instance.RestartSync();
                     return true;
                 }
                 else

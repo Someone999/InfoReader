@@ -24,7 +24,6 @@ namespace InfoReaderPlugin.ExpressionParser.Function.Manager
                     for (int j = 0; j < paramList.Length; j++)
                     {
                         Type currentType = invokeTypes[j], correctType = paramList[j];
-
                         correctTypes.Append(correctType.Name);
                         currentTypes.Append(currentType.Name);
                         if (j < paramList.Length - 1)
@@ -40,7 +39,6 @@ namespace InfoReaderPlugin.ExpressionParser.Function.Manager
                     return false;
                 }
             }
-
             return true;
         }
 
