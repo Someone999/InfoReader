@@ -58,6 +58,7 @@ namespace InfoReaderPlugin.Command.CommandClasses
                             _msgLoopStarted = true;
                         return true;
                     }
+
                     if (instance.Setting.DebugMode.ToString().Equals("True", StringComparison.OrdinalIgnoreCase))
                         IO.CurrentIO.Write($"Message loop on VariableViewer is running. Showing window...");
                     _viewer.Show();

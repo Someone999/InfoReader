@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.Threading;
 using InfoReaderPlugin.ExpressionParser;
+using Sync.Tools;
 
 namespace InfoReaderPlugin
 {
@@ -19,8 +20,18 @@ namespace InfoReaderPlugin
         {
             while (true)
             {
-                
                 Thread.Sleep(5);
+                _outputMapStream = CurrentStatusMmf?.StreamOfMappedFile;
+                if(CurrentStatusMmf is null || !CurrentStatusMmf.EnableOutput)
+                {
+                    /*byte[] empty = new byte[1024];
+                    _outputMapStream?.Write( empty, 0, empty.Length);*/
+                    continue;
+                }
+                if (_outputMapStream is null)
+                {
+                    continue;
+                }
                 try
                 {
                     if (_rawFormat?.ToString() != _fileFormat)
@@ -95,8 +106,17 @@ namespace InfoReaderPlugin
                 }
 
                 byte[] bytes = Encoding.GetEncoding(Setting.Encoding).GetBytes(_rawFormat.ToString() + "\0\0");
-                _outputMapStream = _outputInfoMap.CreateViewStream();
-                _outputMapStream.Write(bytes, 0, bytes.Length);
+                try
+                {
+                    
+                    _outputMapStream.Write(bytes, 0, bytes.Length);
+                }
+                catch (NotSupportedException e)
+                {
+                    IO.CurrentIO.WriteColor(e.ToString(),ConsoleColor.Red);
+                }
+
+                
             }
 
         }

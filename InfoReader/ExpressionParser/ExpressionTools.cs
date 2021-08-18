@@ -393,7 +393,7 @@ namespace InfoReaderPlugin.ExpressionParser
             return val.ToString() != "Unknown Variable";
         }
 
-        public static bool IsNumber(string str,out double result)
+        /*public static bool IsNumber(string str,out double result)
         {
             result = 0;
             string[] parts = str.Split('.');
@@ -406,7 +406,7 @@ namespace InfoReaderPlugin.ExpressionParser
             bool doubleSuc = parts.Length <= 1 || double.TryParse(parts[1], out doubleResult);
             result = doubleResult + intResult;
             return doubleSuc && intSuc;
-        }
+        }*/
         
     }
 }

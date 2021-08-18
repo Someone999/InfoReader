@@ -1,124 +1,17 @@
-﻿using Sync.Plugins;
-using Sync.Tools;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
+using InfoReaderPlugin.Attribute;
 using InfoReaderPlugin.I18n;
-using osuTools;
 using osuTools.Attributes;
-using osuTools.Beatmaps;
-using osuTools.OsuDB;
+using Sync.Plugins;
+using Sync.Tools;
 
 namespace InfoReaderPlugin
 {
-
-    public class PEvent : IPluginEvent
-    {
-        public PEvent(string msg)
-        {
-            Message = msg;
-        }
-        public string Message { get; }
-    }
-    public class PluginVersion:IEqualityComparer<PluginVersion>
-    {
-        public int Major { get; internal set; }
-        public int Minor { get; internal set; }
-        public int Additional { get; internal set; }
-        public PluginVersion(string verstr)
-        {
-            if (string.IsNullOrEmpty(verstr) || string.IsNullOrWhiteSpace(verstr))
-            {
-                throw new ArgumentNullException(nameof(verstr),@"版本号不能为空。");
-            }
-            Major = 0;
-            Minor = 0;
-            Additional = 0;
-            string[] vers = verstr.Split(new[] { '.' },StringSplitOptions.RemoveEmptyEntries);
-            if (vers.Length == 3)
-            {
-                Major = int.Parse(vers[0]);
-                Minor = int.Parse(vers[1]);
-                Additional = int.Parse(vers[2]);
-            }
-            if (vers.Length == 2)
-            {
-                Major = 0;
-                Minor = int.Parse(vers[0]);
-                Additional = int.Parse(vers[1]);
-            }
-
-            if (vers.Length <= 1)
-            {
-                Major = 0;
-                Minor = 0;
-                double b = 0;
-                bool r = double.TryParse(verstr, out b);
-                if (!r) throw new ArgumentException("版本号的格式不正确。");
-                Additional = (int)b;
-            }       
-        }
-        public static bool operator >(PluginVersion a, PluginVersion b)
-        {
-            if (a is null || b is null)
-                return false;
-            if (a.Major > b.Major) return true;
-            if (a.Minor > b.Minor) return true;
-            return a.Additional > b.Additional;
-        }
-        public static bool operator <(PluginVersion a, PluginVersion b)
-        {
-            if (a is null || b is null)
-                return false;
-            if (a.Major < b.Major) return true;
-            if (a.Minor < b.Minor) return true;
-            return a.Additional < b.Additional;
-        }
-        public static bool operator==(PluginVersion a, PluginVersion b)
-        {
-            if (a is null && b is null) return true;
-            if (a is null || b is null) return false;
-            return a.Major == b.Major && a.Minor == b.Minor && a.Additional == b.Additional;
-        }
-        public static bool operator !=(PluginVersion a, PluginVersion b)
-        {
-            if (a is null && b is null) return false;
-            if (a is null || b is null) return true;
-            
-            return a.Major != b.Major || a.Minor != b.Minor || a.Additional != b.Additional;
-        }
-        public override string ToString()
-        {
-            return $"{Major}.{Minor}.{Additional}";
-        }
-        public bool Equals(PluginVersion a, PluginVersion b) => a == b;
-        public int GetHashCode(PluginVersion a) => a.Additional * 10 + a.Minor * 102 + a.Major * 1024 + 1354691254;
-        public override bool Equals(object obj)
-        {
-            if (obj is PluginVersion p)
-                return Equals(this, p);
-            return false;
-        }
-        public override int GetHashCode()
-        {
-            return GetHashCode(this);
-        }
-        public static readonly PluginVersion OldestVersion = new PluginVersion("0.0.20200918");
-    }
-    public class InfoReaderVersionAttribute : Attribute
-    {
-        public InfoReaderVersionAttribute(string ver)
-        {
-            Version = new PluginVersion(ver);
-        }
-        public PluginVersion Version { get; }
-    }
-
-
     [InfoReaderVersion("1.0.16")]
     public partial class InfoReader
     {
@@ -154,11 +47,6 @@ namespace InfoReaderPlugin
             }
             ThreadPool.QueueUserWorkItem(state => ConigFileWatcher());
             ThreadPool.QueueUserWorkItem(state => RefreshMmf());
-        }
-
-        private void GetFunctions()
-        {
-
         }
 
         private void GetAvaProperties(object obj)
@@ -206,7 +94,26 @@ namespace InfoReaderPlugin
                             }
                         });
                         if (avaAttrs.Count > 0)
-                            GetAvaProperties(property.GetValue(obj));
+                        {
+                            try
+                            {
+                                GetAvaProperties(property.GetValue(obj));
+                            }
+                            catch (NullReferenceException)
+                            {
+                                //ignored
+                            }
+                            catch (ArgumentException)
+                            {
+                                //ignored
+                            }
+                            catch(TargetInvocationException)
+                            {
+                                //ignored
+                            }
+
+                            
+                        }
 
                     }
                 }

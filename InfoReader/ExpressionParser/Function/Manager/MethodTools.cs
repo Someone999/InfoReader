@@ -10,7 +10,7 @@ namespace InfoReaderPlugin.ExpressionParser.Function.Manager
 {
     public static class MethodTools
     {
-        public static bool CheckParameterTypes(Type[] invokeTypes, Type[] paramList, bool throwWhenFailed)
+        public static bool CheckParameterTypes(string methodName, Type[] invokeTypes, Type[] paramList, bool throwWhenFailed)
         {
             if (invokeTypes.Length == 0 && paramList.Length == 0)
                 return true;
@@ -35,19 +35,19 @@ namespace InfoReaderPlugin.ExpressionParser.Function.Manager
                     correctTypes.Append(')');
                     currentTypes.Append(')');
                     if (throwWhenFailed)
-                        throw new InvokeFailedException("调用指定方法失败",new ParameterTypesMismatchedException($"参数类型不匹配。应为{correctTypes}，但是现在是{currentTypes}"));
+                        throw new InvokeFailedException($"调用方法{methodName}失败",new ParameterTypesMismatchedException($"参数类型不匹配。应为{correctTypes}，但是现在是{currentTypes}"));
                     return false;
                 }
             }
             return true;
         }
 
-        public static bool CheckParameterCount(int invokeParamCount, int paramCount, bool throwWhenFailed)
+        public static bool CheckParameterCount(string methodName, int invokeParamCount, int paramCount, bool throwWhenFailed)
         {
             if (invokeParamCount == paramCount) return true;
             if (throwWhenFailed)
             {
-                throw new InvokeFailedException("调用指定方法失败", new ParameterCountMismatchedException($"参数计数不匹配。应有{paramCount}个，但是现在有{invokeParamCount}个。"));
+                throw new InvokeFailedException($"调用方法{methodName}失败", new ParameterCountMismatchedException($"参数计数不匹配。应有{paramCount}个，但是现在有{invokeParamCount}个。"));
             }
             return false;
         }

@@ -42,7 +42,7 @@ namespace InfoReaderPlugin.ExpressionParser
         public override string Type => "Variable";
         public override object GetProcessedValue()
         {
-            if (ExpressionTools.IsNumber(NoFormatExpression, out double val))
+            if (double.TryParse(NoFormatExpression, out double val))
             {
                 try
                 {

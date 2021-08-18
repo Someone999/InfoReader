@@ -1,18 +1,20 @@
-﻿using Sync.Tools;
+﻿using System;
+using Sync.Tools;
 using Sync.Tools.ConfigurationAttribute;
 using System.IO;
 using System.Windows;
+using InfoReaderPlugin.Config.Converters;
 using InfoReaderPlugin.I18n;
 
 namespace InfoReaderPlugin
 {
     public class Setting : IConfigurable
     {
-        bool _debug = false;
+        private readonly BoolConfigConverter _boolConfigConverter = new BoolConfigConverter(false);
         internal string encoding = "utf-8";
         public ConfigurationElement ApiKey { get; set; } = "";
         [Bool]
-        public ConfigurationElement DebugMode { get => _debug.ToString(); set => _debug = bool.Parse(value); }
+        public ConfigurationElement DebugMode { get => _boolConfigConverter.ConvertToString(); set => _boolConfigConverter.Convert(value); }
         [Path]
         public ConfigurationElement DefaultMusicCopyingDirectory { get; set; } = $"{System.Environment.CurrentDirectory}\\BeatmapMusic\\";
         [Path]

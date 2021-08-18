@@ -8,9 +8,6 @@ namespace InfoReaderPlugin.ExpressionParser.Function.Manager
 {
     public class ReflectMethodInfo
     {
-
-        
-       
         public ReflectMethodInfo(MethodInfo method,object reflectObject = null)
         {
             ReflectObject = reflectObject;
@@ -24,8 +21,8 @@ namespace InfoReaderPlugin.ExpressionParser.Function.Manager
             List<Type> paramsTypes = new List<Type>(from p in parameters select p.GetType());
             var paramList = Method.GetParameters();
             var realParamTypes = (from param in paramList select param.ParameterType).ToArray();
-            bool countMatched = MethodTools.CheckParameterCount(parameters.Length,paramList.Length,true);
-            bool typesMatched = MethodTools.CheckParameterTypes(paramsTypes.ToArray(),realParamTypes,true);
+            bool countMatched = MethodTools.CheckParameterCount(Method.Name,parameters.Length,paramList.Length,true);
+            bool typesMatched = MethodTools.CheckParameterTypes(Method.Name, paramsTypes.ToArray(),realParamTypes,true);
             if (!(countMatched && typesMatched))
             {
                 success = false;

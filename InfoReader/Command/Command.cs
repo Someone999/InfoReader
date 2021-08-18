@@ -49,7 +49,7 @@ namespace InfoReaderPlugin
                        }
                     }
             }
-            EventBus.RaiseEvent(new PEvent("getinfo"));
+            EventBus.RaiseEvent(new InfoReaderPluginEvent("getinfo"));
             return true;
         }
 

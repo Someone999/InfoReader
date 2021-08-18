@@ -56,8 +56,8 @@ namespace InfoReaderPlugin.ExpressionParser.Function.Manager
             foreach (var method in methods)
             {
                 var methodParamsTypes = MethodTools.GetParameterTypes(method.Method.GetParameters());
-                var countMatched = MethodTools.CheckParameterCount(parametersTypes.Length, methodParamsTypes.Length, true);
-                var typesMatched = MethodTools.CheckParameterTypes(parametersTypes, methodParamsTypes, true);
+                var countMatched = MethodTools.CheckParameterCount(methodName,parametersTypes.Length, methodParamsTypes.Length, true);
+                var typesMatched = MethodTools.CheckParameterTypes(methodName,parametersTypes, methodParamsTypes, true);
                 if (countMatched && typesMatched)
                     return method;
             }

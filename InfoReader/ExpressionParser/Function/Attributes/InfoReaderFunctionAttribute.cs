@@ -2,7 +2,7 @@
 
 namespace InfoReaderPlugin.ExpressionParser.Function.Attributes
 {
-    public class InfoReaderFunctionAttribute:Attribute
+    public class InfoReaderFunctionAttribute:System.Attribute
     {
     }
 }
