@@ -4,7 +4,7 @@
     public interface IConverterBase
     {
         string ConverterName { get;  }
-        object Value { get; }
+        object StoredValue { get; }
         object Convert(string str);
         string ConvertToString();
     }

@@ -12,7 +12,7 @@ namespace InfoReaderPlugin.StatusMmfPair
     {
         protected StatusMmf(string mmfName)
         {
-            if (mmfName is null)
+            if (string.IsNullOrEmpty(mmfName))
                 return;
             MappedFile = MemoryMappedFile.CreateOrOpen(mmfName,4096);
         }
@@ -31,20 +31,20 @@ namespace InfoReaderPlugin.StatusMmfPair
             currentMmf.EnableOutput = false;
             for (int i = 0; i < 10; i++)
             {
-                currentMmf.StreamOfMappedFile.Write(new byte[1024], 0, 1024);
-                currentMmf.StreamOfMappedFile.Flush();
+                currentMmf.StreamOfMappedFile?.Write(new byte[1024], 0, 1024);
+                currentMmf.StreamOfMappedFile?.Flush();
             }
             newMmf.EnableOutput = true;
         }
        
 
-        private static Dictionary<OsuGameStatus, StatusMmf> _statusMmf;
+        private static Dictionary<OsuGameStatus, StatusMmf> _statusMmfDict;
 
         public static StatusMmf GetMmfByStatus(OsuGameStatus status)
         {
-            if (_statusMmf is null)
+            if (_statusMmfDict is null)
             {
-                _statusMmf = new Dictionary<OsuGameStatus, StatusMmf>();
+                _statusMmfDict = new Dictionary<OsuGameStatus, StatusMmf>();
                 Type[] t = typeof(StatusMmf).Assembly.GetTypes();
                 foreach (var type in t)
                 {
@@ -54,16 +54,14 @@ namespace InfoReaderPlugin.StatusMmfPair
                         StatusMmf statusMmf = constructor?.Invoke(new object[0]) as StatusMmf;
                         if (statusMmf is null)
                             continue;
-                        _statusMmf.Add(statusMmf.TargetStatus, statusMmf);
+                        _statusMmfDict.Add(statusMmf.TargetStatus, statusMmf);
                     }
                 }
 
-                _statusMmf.TryGetValue(status, out var outerMmf);
+                _statusMmfDict.TryGetValue(status, out var outerMmf);
                 return outerMmf;
             }
-            if (_statusMmf.ContainsKey(status))
-                return _statusMmf[status];
-            return null;
+            return _statusMmfDict.ContainsKey(status) ? _statusMmfDict[status] : null;
         }
     }
 }

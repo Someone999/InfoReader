@@ -10,11 +10,12 @@ namespace InfoReaderPlugin
 {
     public class Setting : IConfigurable
     {
-        private readonly BoolConfigConverter _boolConfigConverter = new BoolConfigConverter(false);
+        private readonly BoolConfigConverter _debugModeConverter = new BoolConfigConverter(false);
+        private readonly BoolConfigConverter _autoupdateConverter = new BoolConfigConverter(true);
         internal string encoding = "utf-8";
         public ConfigurationElement ApiKey { get; set; } = "";
         [Bool]
-        public ConfigurationElement DebugMode { get => _boolConfigConverter.ConvertToString(); set => _boolConfigConverter.Convert(value); }
+        public ConfigurationElement DebugMode { get => _debugModeConverter.ConvertToString(); set => _debugModeConverter.Convert(value); }
         [Path]
         public ConfigurationElement DefaultMusicCopyingDirectory { get; set; } = $"{System.Environment.CurrentDirectory}\\BeatmapMusic\\";
         [Path]
@@ -48,6 +49,12 @@ namespace InfoReaderPlugin
                     }
                 }
             }
+        }
+        [Bool]
+        public ConfigurationElement AutoUpdate
+        {
+            get => _autoupdateConverter.ConvertToString();
+            set => _autoupdateConverter.Convert(value);
         }
         public void onConfigurationLoad()
         {

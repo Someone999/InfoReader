@@ -8,7 +8,7 @@ namespace InfoReaderPlugin.ExpressionParser.Function.Converter
 {
     interface IBuiltinConverter<T>:IBuiltinConverterBase
     {
-        new T Value { get; }
+        new T StoredValue { get; }
         new T Convert(string str);
     }
 }

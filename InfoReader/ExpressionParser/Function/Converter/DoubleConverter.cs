@@ -6,18 +6,18 @@ namespace InfoReaderPlugin.ExpressionParser.Function.Converter
     {
         public string ConverterName => "BuiltinDoubleConverter";
 
-        object IConverterBase.Value => Value;
+        object IConverterBase.StoredValue => StoredValue;
 
-        public double Value { get; private set; }
+        public double StoredValue { get; private set; }
         object IConverterBase.Convert(string str) => Convert(str);
 
         public double Convert(string str)
         {
             if (double.TryParse(str, out var rslt))
-                Value = rslt;
+                StoredValue = rslt;
             return rslt;
         }
 
-        public string ConvertToString() => Value.ToString(CultureInfo.CurrentCulture);
+        public string ConvertToString() => StoredValue.ToString(CultureInfo.CurrentCulture);
     }
 }

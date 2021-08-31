@@ -4,7 +4,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using InfoReaderPlugin.Attribute;
+using InfoReaderPlugin.Command.CommandClasses;
 using InfoReaderPlugin.I18n;
 using osuTools.Attributes;
 using Sync.Plugins;
@@ -12,7 +14,7 @@ using Sync.Tools;
 
 namespace InfoReaderPlugin
 {
-    [InfoReaderVersion("1.0.16")]
+    [InfoReaderVersion("1.0.18")]
     public partial class InfoReader
     {
         void Init(PluginEvents.InitPluginEvent e)
@@ -35,7 +37,6 @@ namespace InfoReaderPlugin
                         IO.CurrentIO.Write(NI18n.GetLanguageElement("LANG_INFO_INITSUC"));
                     }
                 }
-                IO.CurrentIO.Write(Environment.CurrentDirectory);
                 var process = System.Diagnostics.Process.GetCurrentProcess();
                 var curdir = process.MainModule?.FileName.Replace("Sync.exe", "plugins");
                 Environment.CurrentDirectory = curdir??"";
@@ -43,10 +44,11 @@ namespace InfoReaderPlugin
             }
             catch (NullReferenceException ex)
             {
-                IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_INFO_INITFAILED") + ex.ToString(), ConsoleColor.Red);
+                IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_INFO_INITFAILED") + ex, ConsoleColor.Red);
             }
             ThreadPool.QueueUserWorkItem(state => ConigFileWatcher());
             ThreadPool.QueueUserWorkItem(state => RefreshMmf());
+            Task.Run(() => Update.CheckUpdate());
         }
 
         private void GetAvaProperties(object obj)
@@ -101,15 +103,15 @@ namespace InfoReaderPlugin
                             }
                             catch (NullReferenceException)
                             {
-                                //ignored
+                                // ignored
                             }
                             catch (ArgumentException)
                             {
-                                //ignored
+                                // ignored
                             }
                             catch(TargetInvocationException)
                             {
-                                //ignored
+                                // ignored
                             }
 
                             

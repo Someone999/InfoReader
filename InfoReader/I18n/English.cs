@@ -6,7 +6,7 @@ namespace InfoReaderPlugin.I18n
     {
         internal English() : base("en-us")
         {
-            SQLiteLanguageDatabase tmpDatabase = new SQLiteLanguageDatabase();
+            SqliteLanguageDatabase tmpDatabase = new SqliteLanguageDatabase();
             FileWriter = FileUpdater = tmpDatabase;
             FileReader = tmpDatabase;
         }

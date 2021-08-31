@@ -2,7 +2,7 @@
 {
     public interface INullableConverter<T>:IConverterBase where T:struct
     {
-        new T? Value { get; }
+        new T? StoredValue { get; }
         new T? Convert(string str);
     }
 }

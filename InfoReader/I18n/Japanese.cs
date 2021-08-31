@@ -6,7 +6,7 @@ namespace InfoReaderPlugin.I18n
     {
         internal Japanese():base("ja-jp")
         {
-            SQLiteLanguageDatabase tmpDatabase = new SQLiteLanguageDatabase();
+            SqliteLanguageDatabase tmpDatabase = new SqliteLanguageDatabase();
             FileWriter = FileUpdater = tmpDatabase;
             FileReader = tmpDatabase;
         }

@@ -20,14 +20,13 @@ namespace InfoReaderPlugin
                     if (_lastMmfStatus != _ortdpWrapper.CurrentStatus)
                     {
                         var lastMmf = CurrentStatusMmf;
-                       
                         var currentMmf = StatusMmf.GetMmfByStatus(_ortdpWrapper.CurrentStatus);
                         lastMmf?.OnMmfChanged(lastMmf,currentMmf);
-                        _fileFormat = currentMmf.FormatString;
+                        
                         CurrentStatusMmf = currentMmf;
                         _lastMmfStatus = _ortdpWrapper.CurrentStatus;
                     }
-
+                    _fileFormat = CurrentStatusMmf?.FormatString ?? "";
                     _ortdpWrapper.DebugMode = Setting.DebugMode.ToBool();
                     _ortdpWrapper.BeatmapReadMethod =
                         (osuTools.OrtdpWrapper.OrtdpWrapper.BeatmapReadMethods) Enum.Parse(

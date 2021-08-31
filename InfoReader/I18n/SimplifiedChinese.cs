@@ -6,7 +6,7 @@ namespace InfoReaderPlugin.I18n
     {
         internal Chinese() : base("zh-cn")
         {
-            SQLiteLanguageDatabase tmpDatabase = new SQLiteLanguageDatabase("InfoReader.db");
+            SqliteLanguageDatabase tmpDatabase = new SqliteLanguageDatabase("InfoReader.db");
             FileWriter = FileUpdater = tmpDatabase;
             FileReader = tmpDatabase;
 

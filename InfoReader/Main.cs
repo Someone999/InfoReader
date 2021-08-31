@@ -9,8 +9,10 @@ using System.Security.Cryptography;
 using Sync.Plugins;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using InfoReaderPlugin.Command;
 using InfoReaderPlugin.Command.CommandClasses;
+using InfoReaderPlugin.Command.Tools;
 using InfoReaderPlugin.I18n;
 using InfoReaderPlugin.StatusMmfPair;
 using osuTools.Game;
@@ -59,13 +61,13 @@ namespace InfoReaderPlugin
             {
                 if (type.GetInterfaces().Any(i => i == typeof(ICommandProcessor)))
                 {
-                    ICommandProcessor processor = type.GetConstructor(new Type[0])?.Invoke(new object[0]) as ICommandProcessor;
-                    if (!(processor is null))
+                    if (type.GetConstructor(new Type[0])?.Invoke(new object[0]) is ICommandProcessor processor)
                         CommandProcessors.AddCommandProcessor(processor);
                 }
             }
         }
-        public InfoReader() : base(PLUGIN_NAME, PLUGIN_AUTHOR)
+
+        void InitializeLanguage()
         {
             CheckDatabase();
             StringBuilder builder = new StringBuilder(32);
@@ -73,6 +75,10 @@ namespace InfoReaderPlugin
             SyncLang = builder.ToString();
             CurrentNi18N = NI18n.GetCurrentLanguage();
             CurrentNi18N.InitializeOperator();
+        }
+        public InfoReader() : base(PLUGIN_NAME, PLUGIN_AUTHOR)
+        {
+            InitializeLanguage();
             ScanCommand();
             CheckRtppd();
             /*if(!File.Exists("bass.dll"))

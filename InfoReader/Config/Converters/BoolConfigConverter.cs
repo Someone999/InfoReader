@@ -5,21 +5,21 @@ namespace InfoReaderPlugin.Config.Converters
     public class BoolConfigConverter :  IConverter<bool>
     {
         public string ConverterName => "Internal_Config_Bool_Converter";
-        public bool Value { get; private set; }
+        public bool StoredValue { get; private set; }
 
         public BoolConfigConverter(bool initValue)
         {
-            Value = initValue;
+            StoredValue = initValue;
         }
-        object IConverterBase.Value => Value;
+        object IConverterBase.StoredValue => StoredValue;
 
         object IConverterBase.Convert(string str)
         {
-            return Value = Convert(str);
+            return StoredValue = Convert(str);
         }
 
-        public bool Convert(string str) => bool.Parse(str);
+        public bool Convert(string str) => StoredValue = bool.Parse(str);
 
-        public string ConvertToString() => Value.ToString();
+        public string ConvertToString() => StoredValue.ToString();
     }
 }

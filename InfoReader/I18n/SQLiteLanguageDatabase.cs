@@ -2,15 +2,64 @@
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
+using System.Reflection;
+using System.Windows.Media;
 
 namespace InfoReaderPlugin.I18n
 {
-    public class SQLiteLanguageDatabase:ILanguageFileReader,ILanguageFileUpdater
+    public class DatabaseLastUpdateAttribute:System.Attribute
+    {
+        public string UpdateTime { get; }
+        public DatabaseLastUpdateAttribute(string time)
+        {
+            UpdateTime = time;
+        }
+    }
+    [DatabaseLastUpdate("2021/8/25T18:36:39+8")]
+    public class SqliteLanguageDatabase:ILanguageFileReader,ILanguageFileUpdater
     {
         private readonly string _fileName;
         private bool _updated;
 
-        public SQLiteLanguageDatabase(string databaseFile = "InfoReader.db")
+        public static DateTime? LastUpdateTime
+        {
+            get
+            {
+                Type t = typeof(SqliteLanguageDatabase);
+                DatabaseLastUpdateAttribute attr = t.GetCustomAttribute(typeof(DatabaseLastUpdateAttribute)) as DatabaseLastUpdateAttribute;
+                if (attr is null)
+                    return null;
+                if (DateTime.TryParse(attr.UpdateTime, out var retDateTime))
+                    return retDateTime;
+                return null;
+            }
+        }
+
+        public static DateTime? LastUpdateTimeInDatabase
+        {
+            get
+            {
+                SQLiteConnection connection = new SQLiteConnection("DataSource=InfoReader.db");
+                string query = "select UpdateTime from LanguageList where LanguageId = \"zh-cn\"";
+                connection.Open();
+                var cmd = connection.CreateCommand();
+                cmd.CommandText = query;
+                var reader = cmd.ExecuteReader();
+                
+                if (reader.HasRows && reader.Read())
+                {
+                    string datetimeString = reader["UpdateTime"].ToString();
+                    bool convertSuc = DateTime.TryParse(datetimeString, out var ret);
+                    reader.Close();
+                    connection.Close();
+                    return convertSuc ? (DateTime?)ret : null;
+                }
+                reader.Close();
+                connection.Close();
+                return null;
+            }
+        }
+        public SqliteLanguageDatabase(string databaseFile = "InfoReader.db")
         {
             _fileName = databaseFile;
             if(!File.Exists("InfoReader.db"))
@@ -58,12 +107,9 @@ namespace InfoReaderPlugin.I18n
             var reader = command.ExecuteReader();
             if (!reader.HasRows)
                 return "null";
-            else
+            while (reader.Read())
             {
-                while (reader.Read())
-                {
-                    return reader[key].ToString();
-                }
+                return reader[key].ToString();
             }
             CloseConnection(connection);
             return "null";
@@ -71,6 +117,12 @@ namespace InfoReaderPlugin.I18n
 
         public bool NeedUpdate(string languageId)
         {
+            if (LastUpdateTime.HasValue && LastUpdateTimeInDatabase.HasValue)
+            {
+                TimeSpan differ = LastUpdateTime.Value.ToUniversalTime() - LastUpdateTimeInDatabase.Value.ToUniversalTime();
+                if (Math.Abs(differ.Days) > 1)
+                    return true;
+            }
             
             if (_updated)
                 return false;
