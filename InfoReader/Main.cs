@@ -10,6 +10,7 @@ using Sync.Plugins;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using InfoReaderPlugin.Attribute;
 using InfoReaderPlugin.Command;
 using InfoReaderPlugin.Command.CommandClasses;
 using InfoReaderPlugin.Command.Tools;
@@ -25,6 +26,7 @@ namespace InfoReaderPlugin
 
 {
     [SyncSoftRequirePlugin("RealTimePPDisplayerPlugin", "OsuRTDataProviderPlugin")]
+    [InfoReaderVersion("1.0.19")]
     public partial class InfoReader : Sync.Plugins.Plugin
     {
         //osuTools.Online.OnlineBestResultCollection best = new osuTools.Online.OnlineBestResultCollection();

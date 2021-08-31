@@ -14,7 +14,6 @@ using Sync.Tools;
 
 namespace InfoReaderPlugin
 {
-    [InfoReaderVersion("1.0.18")]
     public partial class InfoReader
     {
         void Init(PluginEvents.InitPluginEvent e)
