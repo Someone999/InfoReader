@@ -17,12 +17,8 @@ namespace InfoReaderPlugin.Command.Tools
         {
             List<UpdateFileInfo> files = new List<UpdateFileInfo>();
             string url = string.Format(InfoReaderUrl.FileInfo, pluginVersion);
-            HttpWebRequest request = WebRequest.CreateHttp(url);
-            using (StreamReader reader = new StreamReader(request?.GetResponse().GetResponseStream() ?? new MemoryStream()))
-            {
-                string fileInfo = reader.ReadToEnd();
-                return GetFilesFromJson(pluginVersion,(JObject)JsonConvert.DeserializeObject(fileInfo));
-            }
+            string fileInfo = WebHelper.GetWebPageContent(url, timeout: 3000);
+            return GetFilesFromJson(pluginVersion,(JObject)JsonConvert.DeserializeObject(fileInfo));
         }
 
         public string FriendlyName { get; internal set; }

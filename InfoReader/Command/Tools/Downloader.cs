@@ -29,7 +29,7 @@ namespace InfoReaderPlugin.Command.Tools
             _baseUrl = WebHelper.UrlAutoComplete(baseUrl);
         }
 
-        public void Download(string fileName,string localFileName = null,string md5 = null)
+        public void Download(string fileName,string localFileName = null,string md5 = null,int timeout = 100000)
         {
             try
             {
@@ -37,6 +37,7 @@ namespace InfoReaderPlugin.Command.Tools
                 localFileName = localFileName ?? fileName;
                 string fileNameNew = $"{localFileName}_new";
                 Request = WebRequest.CreateHttp(url);
+                Request.Timeout = timeout;
                 using (HttpWebResponse response = Request.GetResponse() as HttpWebResponse)
                 {
                     HttpStatusCode? statusCode = response?.StatusCode;
@@ -88,10 +89,10 @@ namespace InfoReaderPlugin.Command.Tools
             
         }
 
-        public void Download(UpdateFileInfo updateFile, PluginVersion version)
+        public void Download(UpdateFileInfo updateFile, PluginVersion version, int timeout = 100000)
         {
             _baseUrl = string.Format(InfoReaderUrl.PluginDownloadUrl,version);
-            Download(updateFile.FileName, Path.Combine("InfoReader",updateFile.DownloadPath), updateFile.Md5);
+            Download(updateFile.FileName, Path.Combine("InfoReader",updateFile.DownloadPath), updateFile.Md5, timeout);
         }
     }
 }

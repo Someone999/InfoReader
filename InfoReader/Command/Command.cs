@@ -44,7 +44,7 @@ namespace InfoReaderPlugin
                        if (!handled)
                        {
                            string notification = string.Format(NI18n.GetLanguageElement("LANG_ERR_UNHANDLEDEXCEPTION"),
-                               p.MainCommand, ex);
+                               p.MainCommand,ex);
                            IO.CurrentIO.WriteColor(notification,ConsoleColor.Red);
                        }
                     }

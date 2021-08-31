@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Text;
+using Sync.Tools;
 
 namespace InfoReaderPlugin.Command.Tools
 {
@@ -53,20 +54,39 @@ namespace InfoReaderPlugin.Command.Tools
                 throw new ArgumentException();
             return schema + Uri.EscapeUriString(urlWithoutSchema);
         }
-        public static string GetWebPageContent(string url)
+
+        static string GetWebPageContentInternal(string url,out Exception executingException, int timeout = 100000, int maxRetryCount = 5, int currentRetry = 0)
         {
+            executingException = null;
             try
             {
                 Uri u = new Uri(UrlAutoComplete(url));
                 HttpWebRequest request = WebRequest.CreateHttp(url);
+                request.Timeout = timeout;
                 StreamReader reader = new StreamReader(request.GetResponse().GetResponseStream() ?? new MemoryStream());
                 return reader.ReadToEnd();
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                executingException = e;
                 return null;
             }
             
+        }
+        public static string GetWebPageContent(string url,int maxRetryCount = 5, int timeout = 100000)
+        {
+            int currentRetry = 0;
+            string ret;
+            Exception executingException;
+            do
+            {
+                ret = GetWebPageContentInternal(url,out executingException, timeout, maxRetryCount, currentRetry);
+                if (string.IsNullOrEmpty(ret))
+                    currentRetry++;
+            } while (string.IsNullOrEmpty(ret) && currentRetry <= maxRetryCount);
+            if(string.IsNullOrEmpty(ret))
+                IO.CurrentIO.WriteColor(executingException.ToString(),ConsoleColor.Red);
+            return ret ?? "";
         }
 
     }

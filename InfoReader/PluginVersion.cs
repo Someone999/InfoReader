@@ -136,11 +136,11 @@ namespace InfoReaderPlugin
         {
             get
             {
-                string version = WebHelper.GetWebPageContent(InfoReaderUrl.LatestVersion);
+                string version = WebHelper.GetWebPageContent(InfoReaderUrl.LatestVersion, timeout: 5000);
                 if (string.IsNullOrEmpty(version))
                     return CurrentVersion;
                 JObject verObj = (JObject)JsonConvert.DeserializeObject(version);
-                return new PluginVersion(verObj?["VersionString"]?.ToString() ?? CurrentVersion.ToString());
+                return new PluginVersion(verObj?["version_string"]?.ToString() ?? CurrentVersion.ToString());
             }
         }
 
@@ -149,7 +149,7 @@ namespace InfoReaderPlugin
         {
             Dictionary<AvailabilityObject, bool> dict = new Dictionary<AvailabilityObject, bool>();
             string url = string.Format(InfoReaderUrl.AvaliabilityInfo, this, (int)toQuery);
-            var content = WebHelper.GetWebPageContent(url);
+            var content = WebHelper.GetWebPageContent(url, timeout: 5000);
             JObject jobj = (JObject)JsonConvert.DeserializeObject(content);
             if (jobj is null)
             {
@@ -170,14 +170,8 @@ namespace InfoReaderPlugin
             if (!GetAvailability(AvailabilityObject.Changelog)[AvailabilityObject.Changelog])
                 return "This version has no changelog.";
             string url = string.Format(InfoReaderUrl.Changelog, this);
-            HttpWebRequest request = WebRequest.CreateHttp(url);
-            using (StreamReader reader = new StreamReader(request.GetResponse().GetResponseStream() ??
-                                                          throw new Exception("Fail to get changelog.")))
-            {
-                string changelog = reader.ReadToEnd();
-                return changelog;
-            }
-            
+            string changelog = WebHelper.GetWebPageContent(url, timeout: 5000);
+            return changelog ?? "Fail to get changelog.";
         }
 
     }

@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Net;
+using InfoReaderPlugin.Command.Tools;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -9,13 +10,8 @@ namespace InfoReaderPlugin
     {
         public override int GetVersionId(string versionString)
         {
-            HttpWebRequest request = WebRequest.CreateHttp("http://archaring.xyz/plugin/latestversion");
-            Stream s = request.GetResponse().GetResponseStream() ?? new MemoryStream();
-            using (StreamReader reader = new StreamReader(s))
-            {
-                JToken token = (JToken)JsonConvert.DeserializeObject(reader.ReadToEnd());
-                return token?["version_id"]?.ToObject<int>() ?? -1;
-            }
+            JToken token = (JToken)JsonConvert.DeserializeObject(WebHelper.GetWebPageContent(InfoReaderUrl.LatestVersion, timeout: 5000));
+            return token?["version_id"]?.ToObject<int>() ?? -1;
         }
     }
 }

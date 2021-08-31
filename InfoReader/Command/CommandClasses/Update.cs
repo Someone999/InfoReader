@@ -43,7 +43,7 @@ namespace InfoReaderPlugin.Command.CommandClasses
         {
             
             var args = parser.Arguments;
-            if (args.Count <= 0)
+            if (args.Count < 1)
             {
                 CheckUpdate(true);
                 return true;

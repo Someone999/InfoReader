@@ -18,9 +18,11 @@ namespace InfoReaderPlugin.Command.Tools
             
             Downloader downloader = new Downloader(Update.PluginServerUrl);
             var files = UpdateFileInfo.GetFiles(version);
-            foreach (var updateFileInfo in files)
+            int fileCount = files.Length;
+            for (int i = 0;i<files.Length;i++)
             {
-                IO.CurrentIO.Write(string.Format(NI18n.GetLanguageElement("LANG_INFO_DOWNLOAD"),updateFileInfo.FriendlyName));
+                var updateFileInfo = files[i];
+                IO.CurrentIO.Write(string.Format(NI18n.GetLanguageElement("LANG_INFO_DOWNLOAD"),updateFileInfo.FriendlyName) + $" ({i + 1}/{fileCount})");
                 updateFileInfo.Download(version, downloader);
                 IO.CurrentIO.Write(NI18n.GetLanguageElement("LANG_INFO_DOWNLOADED"));
             }
