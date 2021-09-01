@@ -6,6 +6,7 @@ using System.Threading;
 using InfoReaderPlugin.Attribute;
 using InfoReaderPlugin.Command.CommandClasses;
 using InfoReaderPlugin.Command.Tools;
+using InfoReaderPlugin.I18n;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -54,7 +55,7 @@ namespace InfoReaderPlugin
                 Minor = 0;
                 double b = 0;
                 bool r = double.TryParse(verstr, out b);
-                if (!r) throw new ArgumentException("Format of version is wrong。");
+                if (!r) throw new ArgumentException(NI18n.GetLanguageElement("LANG_ERR_VERSIONFORMAT"));
                 Additional = (int)b;
             }
         }
@@ -168,10 +169,10 @@ namespace InfoReaderPlugin
         public string GetChangelog()
         {
             if (!GetAvailability(AvailabilityObject.Changelog)[AvailabilityObject.Changelog])
-                return "This version has no changelog.";
+                return string.Format(NI18n.GetLanguageElement("LANG_ERR_NOCHANGELOG"), this);
             string url = string.Format(InfoReaderUrl.Changelog, this);
             string changelog = WebHelper.GetWebPageContent(url, timeout: 5000);
-            return changelog ?? "Fail to get changelog.";
+            return changelog ?? NI18n.GetLanguageElement("LANG_ERR_FAILTOGETCHANGELOG");
         }
 
     }

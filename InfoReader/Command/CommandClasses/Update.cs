@@ -61,47 +61,12 @@ namespace InfoReaderPlugin.Command.CommandClasses
                     }
                     catch (FormatException)
                     {
-                        IO.CurrentIO.WriteColor("Wrong format of version. Must be a.b.c", ConsoleColor.Red);
+                        IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_ERR_VERSIONFORMAT"), ConsoleColor.Red);
                     }
                 }
             }
 
-            if (args[0] == "download")
-            {
-                if (args.Count < 1)
-                    IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_ERR_NOVERSION"), ConsoleColor.Yellow);
-                if (args.Count == 2)
-                {
-                    try
-                    {
-                        PluginVersion p = new PluginVersion(args[1]);
-                        if (p == PluginVersion.CurrentVersion)
-                        {
-                            IO.CurrentIO.Write(NI18n.GetLanguageElement("LANG_INFO_VERSIONISSAME"));
-                            return true;
-                        }
-
-                        if (p < new PluginVersion("1.0.18"))
-                        {
-                            IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_WARN_DOWNGRADE"),ConsoleColor.Yellow);
-                            IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_WARN_CONFIRMDOWNGRADE"), ConsoleColor.Yellow);
-                            string s = IO.CurrentIO.ReadCommand();
-                            if (s == "yes")
-                            {
-                                instance.Setting.AutoUpdate = "False";
-                                UpdateHelper.DownloadFiles(p);
-                            }
-                            IO.CurrentIO.Write(NI18n.GetLanguageElement("LANG_INFO_NEEDTORESTART"));
-                            return true;
-                        }
-
-                    }
-                    catch (FormatException)
-                    {
-                        IO.CurrentIO.WriteColor("Wrong format of version. Must be a.b.c", ConsoleColor.Red);
-                    }
-                }
-            }
+            
 
             return true;
         }
