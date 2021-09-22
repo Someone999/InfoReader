@@ -24,8 +24,6 @@ namespace InfoReaderPlugin
                 _outputMapStream = CurrentStatusMmf?.StreamOfMappedFile;
                 if(CurrentStatusMmf is null || !CurrentStatusMmf.EnableOutput)
                 {
-                    /*byte[] empty = new byte[1024];
-                    _outputMapStream?.Write( empty, 0, empty.Length);*/
                     continue;
                 }
                 if (_outputMapStream is null)
@@ -36,16 +34,14 @@ namespace InfoReaderPlugin
                 {
                     if (_rawFormat?.ToString() != _fileFormat)
                         _rawFormat = new StringBuilder(_fileFormat ?? "");
-                    Regex varPattern = new Regex(@"\$\{[^,\{\}]*(:[\w\.]*)?\}"); //
-                    Regex boolPattern = new Regex(@"\$if\{[^\{\}]*[\w><=!&\|\+\-\*/\(\)]*,[^{}]*,[^{}]*\}");
-                    MatchCollection varMatches = varPattern.Matches(_rawFormat.ToString());
-                    MatchCollection boolMatches = boolPattern.Matches(_rawFormat.ToString());
-                    if (varMatches.Count > 0)
-                        foreach (Match match in varMatches)
+                    var variableResult = ExpressionMatchers[ExpressionTypes.Builtin | ExpressionTypes.Variable].Results;
+                    var boolResult = ExpressionMatchers[ExpressionTypes.Builtin | ExpressionTypes.If].Results;
+                    if (variableResult.Length > 0)
+                        foreach (string match in variableResult)
                         {
                             try
                             {
-                                _matchedValue = match.Value;
+                                _matchedValue = match;
                                 VariableExpression expression = new VariableExpression(_matchedValue, _ortdpWrapper);
 
                                 _replaceStr = ExpressionTools.CalcRpnExpression(
@@ -59,7 +55,7 @@ namespace InfoReaderPlugin
                                     _rawFormat.Replace("\r", "\r");
                                 }
 
-                                _rawFormat.Replace(match.Value, _replaceStr);
+                                _rawFormat.Replace(match, _replaceStr);
                             }
                             catch (NullReferenceException)
                             {
@@ -75,12 +71,12 @@ namespace InfoReaderPlugin
                             _rawFormat.Append("\0\0");
                         }
 
-                    if (boolMatches.Count > 0)
-                        foreach (Match match in boolMatches)
+                    if (boolResult.Length > 0)
+                        foreach (string match in boolResult)
                         {
                             try
                             {
-                                _matchedValue = match.Value;
+                                _matchedValue = match;
                                 IfExpression expression = new IfExpression(_matchedValue, _ortdpWrapper);
                                 _replaceStr = expression.GetProcessedValue().ToString();
                                 if (_rawFormat.ToString().Contains("\n") || _rawFormat.ToString().Contains("\r"))
@@ -89,7 +85,7 @@ namespace InfoReaderPlugin
                                     _rawFormat.Replace("\r", "\r");
                                 }
 
-                                _rawFormat.Replace(match.Value, _replaceStr);
+                                _rawFormat.Replace(match, _replaceStr);
                             }
                             catch (NullReferenceException)
                             {
@@ -108,7 +104,6 @@ namespace InfoReaderPlugin
                 byte[] bytes = Encoding.GetEncoding(Setting.Encoding).GetBytes(_rawFormat.ToString() + "\0\0");
                 try
                 {
-                    
                     _outputMapStream.Write(bytes, 0, bytes.Length);
                 }
                 catch (NotSupportedException e)

@@ -4,24 +4,24 @@ using System.Reflection;
 
 namespace InfoReaderPlugin.ExpressionParser
 {
-    public sealed class VariableExpression : ExpressionType
+    public sealed class VariableExpression : Expression
     {
-        public VariableExpression(string expression, object target) : base(expression, target)
+        public VariableExpression(string expressionString, object target) : base(expressionString, target)
         {
-            if(Expression.StartsWith("${"))
+            if(ExpressionString.StartsWith("${"))
             {
-                Expression = Expression.TrimStart("${".ToCharArray());
+                ExpressionString = ExpressionString.TrimStart("${".ToCharArray());
             }
-            if (Expression.EndsWith("}"))
+            if (ExpressionString.EndsWith("}"))
             {
-                Expression = Expression.TrimEnd("}".ToCharArray());
+                ExpressionString = ExpressionString.TrimEnd("}".ToCharArray());
             }
-            if (Expression.Contains(":"))
+            if (ExpressionString.Contains(":"))
             {
-                string [] strs = Expression.Split(':');
+                string [] strs = ExpressionString.Split(':');
                 if (strs.Length > 2)
                 {
-                    Expression = strs[0];
+                    ExpressionString = strs[0];
                     Format = "";
                     return;
                 }
@@ -31,7 +31,7 @@ namespace InfoReaderPlugin.ExpressionParser
             }
             else
             {
-                NoFormatExpression = Expression;
+                NoFormatExpression = ExpressionString;
             }
         }
 
@@ -39,7 +39,7 @@ namespace InfoReaderPlugin.ExpressionParser
         public string NoFormatExpression { get; private set; }
         public string Format { get; private set; }
         public PropertyInfo CurrentProperty { get; private set; }
-        public override string Type => "Variable";
+        public override ExpressionTypes Type => ExpressionTypes.Builtin | ExpressionTypes.Variable;
         public override object GetProcessedValue()
         {
             if (double.TryParse(NoFormatExpression, out double val))
@@ -62,7 +62,7 @@ namespace InfoReaderPlugin.ExpressionParser
             if (InfoReader.VariablePropertyInfos.Any(m => m.Alias == NoFormatExpression))
             {
                 var variableProperty = (from c in InfoReader.VariablePropertyInfos where c.Alias == NoFormatExpression select c)
-                    .FirstOrDefault()??new VariablePropertyInfo("null","null",null,null);
+                    .FirstOrDefault()??new VariablePropertyInfo("null","null",null);
                 NoFormatExpression = variableProperty.VariableName;
                 namePartial = NoFormatExpression.Split('.');
             }

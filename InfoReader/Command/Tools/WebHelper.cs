@@ -17,6 +17,8 @@ namespace InfoReaderPlugin.Command.Tools
             }
             for (int i = 0; i < parts.Length; i++)
             {
+                if (parts[i].StartsWith("/"))
+                    parts[i] = parts[i].Substring(1);
                 urlBuilder.Append(parts[i]);
                 if (i < parts.Length - 1)
                     urlBuilder.Append("/");

@@ -1,21 +1,21 @@
 ﻿namespace InfoReaderPlugin.ExpressionParser
 {
-    public sealed class IfExpression:ExpressionType
+    public sealed class IfExpression:Expression
     {
         public string TrueResult { get; set; }
         public string FalseResult { get; set; }
-        public IfExpression(string expression,object target) :base(expression,target)
+        public IfExpression(string expressionString,object target) :base(expressionString,target)
         {
         }
-        public override string Type => "If to judgement";
+        public override ExpressionTypes Type => ExpressionTypes.If | ExpressionTypes.Builtin;
         public override object GetProcessedValue()
         {
-            if (Expression.StartsWith("$if{") && Expression.EndsWith("}"))
+            if (ExpressionString.StartsWith("$if{") && ExpressionString.EndsWith("}"))
             {
-                int len = Expression.Length - 4; 
+                int len = ExpressionString.Length - 4; 
                 
                
-                string[] args = Expression.Remove(0, 4).Remove(len - 1, 1).Split(',');
+                string[] args = ExpressionString.Remove(0, 4).Remove(len - 1, 1).Split(',');
                 var rpnExp = ExpressionTools.ConvertToRpnExpression(args[0]);
                 TrueResult = args[1];
                 FalseResult = args[2];

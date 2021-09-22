@@ -101,7 +101,9 @@
     <Compile Include="Command\CommandClasses\Plugin.cs" />
     <Compile Include="Command\CommandClasses\Update.cs" />
     <Compile Include="Command\Tools\Downloader.cs" />
+    <Compile Include="Command\Tools\DownloaderEventHandlerCollection.cs" />
     <Compile Include="Command\Tools\InfoReaderUrl.cs" />
+    <Compile Include="Command\Tools\DownloadProgressChangedEventHandler.cs" />
     <Compile Include="Command\Tools\UpdateFileInfo.cs" />
     <Compile Include="Command\Tools\UpdateHelper.cs" />
     <Compile Include="Command\Tools\WebHelper.cs" />
@@ -127,6 +129,7 @@
     <Compile Include="Exceptions\InvokeFailedException.cs" />
     <Compile Include="Exceptions\ParameterCountMismatchedException.cs" />
     <Compile Include="Exceptions\ParameterTypeMismatchedException.cs" />
+    <Compile Include="ExpressionParser\ExpressionTypes.cs" />
     <Compile Include="ExpressionParser\Function\ArgumentNode.cs" />
     <Compile Include="ExpressionParser\Function\Attributes\InfoReaderFunctionAttribute.cs" />
     <Compile Include="ExpressionParser\Function\BuiltinFunctions.cs" />
@@ -155,7 +158,12 @@
     <Compile Include="I18n\SqliteLanguageDatabase.cs" />
     <Compile Include="InfoReaderEvents.cs" />
     <Compile Include="Attribute\InfoReaderVersionAttribute.cs" />
+    <Compile Include="MySqlDatabaseInfo.cs" />
     <Compile Include="PluginVersion.cs" />
+    <Compile Include="RegexExpressionMatcher\ExpressionMatcherBase.cs" />
+    <Compile Include="RegexExpressionMatcher\FunctionMatcher.cs" />
+    <Compile Include="RegexExpressionMatcher\IfMatcher.cs" />
+    <Compile Include="RegexExpressionMatcher\ValueMatcher.cs" />
     <Compile Include="Resource1.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -167,7 +175,7 @@
     <Compile Include="I18n\NI18n.cs" />
     <Compile Include="ExpressionParser\TypeConstructorInfo.cs" />
     <Compile Include="ExpressionParser\ExpressionTools.cs" />
-    <Compile Include="ExpressionParser\ExpressionType.cs" />
+    <Compile Include="ExpressionParser\Expression.cs" />
     <Compile Include="ExpressionParser\IfExpression.cs" />
     <Compile Include="ExpressionParser\VariableExpression.cs" />
     <Compile Include="SqlServerDatabaseInfo.cs" />

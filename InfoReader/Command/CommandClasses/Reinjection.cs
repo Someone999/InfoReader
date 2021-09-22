@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using InfoReaderPlugin.Command.Tools;
 using InfoReaderPlugin.I18n;
-using InfoReaderPlugin.Plugin.Command.Tools;
 using Sync.Tools;
 
 namespace InfoReaderPlugin.Command.CommandClasses
@@ -15,63 +16,88 @@ namespace InfoReaderPlugin.Command.CommandClasses
         {
             return false;
         }
-        public bool Process(InfoReader instance, CommandParser parser)
+
+        Process UpdateProcess(InfoReader instance,CommandParser parser)
+        {
+            var osuprocesses = System.Diagnostics.Process.GetProcessesByName("osu!");
+            if (osuprocesses.Length == 0)
+            {
+
+                if (string.IsNullOrEmpty(instance.Setting.GameDir))
+                {
+                    IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_INFO_WAITINGFOROSU"), ConsoleColor.Red);
+                    while (osuprocesses.Length == 0)
+                    {
+                        System.Threading.Thread.Sleep(3000);
+                    }
+                }
+                else
+                {
+                    IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_INFO_STARTOSU"), ConsoleColor.Red);
+                    System.Diagnostics.Process.Start(instance.Setting.GameDir);
+
+                }
+            }
+            osuprocesses = System.Diagnostics.Process.GetProcessesByName("osu!");
+            return osuprocesses[0];
+        }
+        bool ContainsModule(string moduleName,Process process)
+        {
+            foreach (ProcessModule module in process.Modules)
+            {
+                if (module.ModuleName.ToUpper().Contains(moduleName.ToUpper()))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        void CheckFile()
+        {
+            if (!File.Exists("injector.exe"))
+                File.WriteAllBytes("injector.exe", Resource1.FallbackInjector);
+        }
+        public bool Reinject(InfoReader instance,CommandParser parser)
         {
             try
             {
-                var osuprocesses = System.Diagnostics.Process.GetProcessesByName("osu!");
-                if (osuprocesses.Length == 0)
-                {
-
-                    if (string.IsNullOrEmpty(instance.Setting.GameDir))
-                    {
-                        IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_INFO_WAITINGFOROSU"), ConsoleColor.Red);
-                        while (osuprocesses.Length == 0)
-                        {
-                            System.Threading.Thread.Sleep(3000);
-                        }
-                    }
-                    else
-                    {
-                        IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_INFO_STARTOSU"), ConsoleColor.Red);
-                        System.Diagnostics.Process.Start(instance.Setting.GameDir);
-
-                    }
-                }
-                osuprocesses = System.Diagnostics.Process.GetProcessesByName("osu!");
-                var osuprocess = osuprocesses[0];
+                
+                var osuprocess = UpdateProcess(instance, parser);
                 var osu = new HandleTypes.ProcessHandle(osuprocess);
-                foreach (ProcessModule module in osuprocess.Modules)
+                if (ContainsModule("Overlay.dll",osuprocess))
                 {
-                    if (module.ModuleName.ToUpper().Contains("Overlay.dll".ToUpper()))
-                    {
-                        IO.CurrentIO.Write(NI18n.GetLanguageElement("LANG_INFO_HASINJECTED"));
-                        return true;
-                    }
+                    IO.CurrentIO.Write(NI18n.GetLanguageElement("LANG_INFO_HASINJECTED"));
+                    return true;
                 }
                 Injector injector = new Injector(osu.PID, $"{Environment.CurrentDirectory}\\..\\overlay.dll");
                 var res = injector.Inject();
                 Stopwatch s = new Stopwatch();
                 if (res)
                 {
-                    var modules = osuprocess.Modules;
+                    
                     s.Start();
-                    while (s.Elapsed.TotalSeconds < 0.5)
+                    while (s.Elapsed.TotalSeconds < 10)
                     {
-                        foreach (ProcessModule module in modules)
+                        osuprocess = UpdateProcess(instance, parser);
+                        bool c = ContainsModule("Overlay.dll", osuprocess);
+                        if (!c) 
+                            continue;
+                        if (instance.Setting.DebugMode.ToString()
+                            .Equals("True", StringComparison.OrdinalIgnoreCase))
                         {
-                            if (module.ModuleName.ToUpper().Contains("Overlay.dll".ToUpper()))
-                            {
-                                IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_INFO_INJECTED"), ConsoleColor.DarkGreen);
-                                IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_INFO_RESTARTSYNC"), ConsoleColor.DarkGreen);
-                                //System.Threading.Thread.Sleep(3000);
-                                //Sync.SyncHost.Instance.RestartSync();
-                                return true;
-                            }
+                            IO.CurrentIO.WriteColor($"Injected in {s.ElapsedMilliseconds} ms", ConsoleColor.DarkGreen);
+                            //之前这个return漏掉了
+                            return true;
                         }
+
+                        return true;
                     }
-                    if (!File.Exists("injector.exe"))
-                        File.WriteAllBytes("injector.exe", Resource1.FallbackInjector);
+                    if (instance.Setting.DebugMode.ToString()
+                        .Equals("True", StringComparison.OrdinalIgnoreCase))
+                        IO.CurrentIO.WriteColor("The first try timed out. Starting next ...", ConsoleColor.Red);
+                    
                     var cinjector = System.Diagnostics.Process.Start(
                         new ProcessStartInfo
                         {
@@ -80,33 +106,28 @@ namespace InfoReaderPlugin.Command.CommandClasses
                             CreateNoWindow = true,
                             UseShellExecute = false
                         });
+                    
+                    CheckFile();
+                    s.Restart();
                     while (s.Elapsed.TotalSeconds < 0.5)
                     {
-                        foreach (ProcessModule module in modules)
+                        osuprocess = UpdateProcess(instance, parser);
+                        bool c = ContainsModule("Overlay.dll", osuprocess);
+                        if (instance.Setting.DebugMode.ToString()
+                            .Equals("True", StringComparison.OrdinalIgnoreCase) && c)
                         {
-                            if (module.ModuleName.ToUpper().Contains("Overlay.dll".ToUpper()))
-                            {
-                                IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_INFO_INJECTED"), ConsoleColor.DarkGreen);
-                                //IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_INFO_RESTARTSYNC"), ConsoleColor.DarkGreen);
-                                //System.Threading.Thread.Sleep(3000);
-                                //Sync.SyncHost.Instance.RestartSync();
-                                return true;
-                            }
+                            IO.CurrentIO.WriteColor($"Injected in {s.ElapsedMilliseconds} ms", ConsoleColor.DarkGreen);
                         }
                     }
-                    IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_INFO_INJECTED"), ConsoleColor.DarkGreen);
-                    //IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_INFO_RESTARTSYNC"), ConsoleColor.DarkGreen);
-                    //System.Threading.Thread.Sleep(3000);
-                    //Sync.SyncHost.Instance.RestartSync();
+                    //IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_INFO_INJECTED"), ConsoleColor.DarkGreen);
+                   
                     return true;
                 }
-                else
-                {
-                    string msg = NI18n.GetLanguageElement("LANG_INJECTIONFAILED");
-                    msg += $"({WinAPI.ErrorHandle.GetLastError()}),{WinAPI.ErrorHandle.GetErrorString(WinAPI.ErrorHandle.FormatMessageFlags.FromSystem)}";
-                    IO.CurrentIO.WriteColor(msg, ConsoleColor.Red);
-                    return true;
-                }
+
+                string msg = NI18n.GetLanguageElement("LANG_INJECTIONFAILED");
+                msg += $"({WinAPI.ErrorHandle.GetLastError()}),{WinAPI.ErrorHandle.GetErrorString(WinAPI.ErrorHandle.FormatMessageFlags.FromSystem)}";
+                IO.CurrentIO.WriteColor(msg, ConsoleColor.Red);
+                return true;
             }
             catch (InvalidOperationException)
             {
@@ -120,6 +141,14 @@ namespace InfoReaderPlugin.Command.CommandClasses
                     IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_ERR_NOOSU"), ConsoleColor.Red);
                 return true;
             }
+        }
+        public bool Process(InfoReader instance, CommandParser parser)
+        {
+            var plugins = Sync.SyncHost.Instance.EnumPluings();
+            if (plugins.Any(p => p.Name == "IngameOverlay")) 
+                return Reinject(instance, parser);
+            IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_ERR_NOINGAMEOVERLAY"),ConsoleColor.Red);
+            return true;
         }
 
         public string GetHelp() => NI18n.GetLanguageElement("LANG_HELP_REINJECT");

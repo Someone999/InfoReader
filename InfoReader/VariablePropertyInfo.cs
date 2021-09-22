@@ -7,7 +7,7 @@ namespace InfoReaderPlugin
     {
         public PropertyInfo Property { get; }
         public string Alias { get; }
-        public object ReflectObject { get; set; }
+        //public object ReflectObject { get; set; }
         public string VariableName { get; set; }
         public override int GetHashCode()
         {
@@ -40,11 +40,10 @@ namespace InfoReaderPlugin
         }
 
         public int GetHashCode(VariablePropertyInfo variablePropertyInfo) => variablePropertyInfo.GetHashCode();
-        public VariablePropertyInfo(string alias,string variableName,PropertyInfo property,object reflectObject)
+        public VariablePropertyInfo(string alias,string variableName,PropertyInfo property/*,object reflectObject*/)
         {
             Alias = alias;
             Property = property;
-            ReflectObject = reflectObject;
             VariableName = variableName;
         }
 

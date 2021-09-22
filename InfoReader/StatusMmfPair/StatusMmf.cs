@@ -48,14 +48,13 @@ namespace InfoReaderPlugin.StatusMmfPair
                 Type[] t = typeof(StatusMmf).Assembly.GetTypes();
                 foreach (var type in t)
                 {
-                    if (type.BaseType == typeof(StatusMmf))
-                    {
-                        var constructor = type.GetConstructor(new Type[0]);
-                        StatusMmf statusMmf = constructor?.Invoke(new object[0]) as StatusMmf;
-                        if (statusMmf is null)
-                            continue;
-                        _statusMmfDict.Add(statusMmf.TargetStatus, statusMmf);
-                    }
+                    if (type.BaseType != typeof(StatusMmf)) 
+                        continue;
+                    var constructor = type.GetConstructor(new Type[0]);
+                    StatusMmf statusMmf = constructor?.Invoke(new object[0]) as StatusMmf;
+                    if (statusMmf is null)
+                        continue;
+                    _statusMmfDict.Add(statusMmf.TargetStatus, statusMmf);
                 }
 
                 _statusMmfDict.TryGetValue(status, out var outerMmf);

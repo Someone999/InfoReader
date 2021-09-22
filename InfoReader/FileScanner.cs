@@ -49,10 +49,17 @@ namespace InfoReaderPlugin
             string ext = Path.GetExtension(file);
             if (ext == ".dll" || ext == ".exe")
                 ext = ".txt";
-            string serverDir = relativeDir.Substring(relativeDir.Length > 1 ? 2 : 1).Replace('\\','/');
+            string serverDir = relativeDir.Replace('\\','/');
+            if (serverDir.StartsWith("/"))
+                serverDir = serverDir.Substring(1);
             string fileName = Path.Combine(serverDir, friendlyName + ext).Replace('\\', '/');
+            if (fileName.StartsWith("/") || fileName.StartsWith("\\"))
+                fileName = fileName.Substring(1);
+
             string md5Hash = CalcMd5(File.ReadAllBytes(file));
             string downloadPath = Path.Combine(relativeDir,Path.GetFileName(file)).Replace("\\","/");
+            if (downloadPath.StartsWith("/") || downloadPath.StartsWith("\\"))
+                downloadPath = downloadPath.Substring(1);
             return new UpdateFileInfo(friendlyName, fileName, downloadPath, md5Hash);
         }
         public string ToUpdateFilesJson(PluginVersion version)
@@ -85,37 +92,28 @@ namespace InfoReaderPlugin
             return json;
         }
 
-        public string ToSqlInsert(PluginVersion version, DatabaseInfo dbInfo)
+        public List<string> ToSqlInsert(PluginVersion version, DatabaseInfo dbInfo)
         {
             StringBuilder builder = new StringBuilder();
-            StringBuilder format = new StringBuilder();
             string verStr = dbInfo.KeywordToNameStart + dbInfo.TableFullName + dbInfo.KeywordToNameEnd;
+            List<string> sqlStatments = new List<string>();
             int verId = dbInfo.GetVersionId(version.ToString());
             if (verId == -1)
                 throw new ArgumentException("Can not get version id by gave string.");
             string[] columns = dbInfo.Columns.Split(',');
             if(columns[0] != "VersionId")
                 throw new ArgumentException("First column must be \"VersioId\"");
-            string prefix = "insert into {0}{1}{2} values (";
-            format.AppendFormat(prefix, dbInfo.KeywordToNameStart, dbInfo.TableFullName, dbInfo.KeywordToNameEnd);
-            for(int i = 0;i<columns.Length;i++)
+            foreach (var updateFileInfo in FileInfos)
             {
-                format.Append($"{{{i}}}");
-                if (i < columns.Length - 1)
-                    format.Append(',');
+                string format =
+                    "INSERT INTO {0}{2}{1} ({0}VersionId{1},{0}FriendlyName{1},{0}FileName{1},{0}DownloadPath{1},{0}Md5Hash{1}) VALUES ({3},'{4}','{5}','{6}','{7}');";
+                string sqlStatement =
+                    string.Format(format, dbInfo.KeywordToNameStart, dbInfo.KeywordToNameEnd,dbInfo.TableFullName,verId,updateFileInfo.FriendlyName
+                        ,updateFileInfo.FileName,updateFileInfo.DownloadPath,updateFileInfo.Md5);
+                sqlStatments.Add(sqlStatement);
             }
-
-            format.Append(')');
-            foreach (var fileInfo in _infos)
-            {
-                builder.AppendFormat(format.ToString(), verId, ToSqlString(fileInfo.FriendlyName), ToSqlString(fileInfo.FileName),
-                    ToSqlString(fileInfo.DownloadPath), ToSqlString(fileInfo.Md5));
-                builder.Append(";\n\r");
-            }
-
-            return builder.ToString();
+            return sqlStatments;
         }
-        string ToSqlString(string str) => $"'{str}'";
     }
     
 }

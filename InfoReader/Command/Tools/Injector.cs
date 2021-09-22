@@ -3,8 +3,9 @@ using System.Runtime.InteropServices;
 using System.Text;
 using InfoReaderPlugin.Plugin.Command.CommandMethods;
 using osuTools;
+using Sync.Tools;
 
-namespace InfoReaderPlugin.Plugin.Command.Tools
+namespace InfoReaderPlugin.Command.Tools
 {
     internal static class Win32Functions
     {
@@ -129,16 +130,19 @@ namespace InfoReaderPlugin.Plugin.Command.Tools
             ReadyForProcess();
             if (_readiedForInject)
             {
+
                 IntPtr hThread = Win32Functions.CreateRemoteThread(_hProcess, IntPtr.Zero, 0, _loadDllPtr,
                     _remoteMemory, 0,
                     IntPtr.Zero);
-
+                var lastError = Marshal.GetLastWin32Error();
                 if (hThread != IntPtr.Zero)
                 {
                     Win32Functions.WaitForSingleObject(hThread, 0xffffffff);
                     Clean();
                     Win32Functions.CloseHandle(hThread);
-                    return true;
+                    int closeH = Marshal.GetLastWin32Error();
+                    IO.CurrentIO.Write($"CreateThread: {lastError}  CloseHandle: {closeH}");
+                    return lastError == 0 && closeH == 0;
                 }
 
                 Clean();

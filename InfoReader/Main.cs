@@ -14,7 +14,9 @@ using InfoReaderPlugin.Attribute;
 using InfoReaderPlugin.Command;
 using InfoReaderPlugin.Command.CommandClasses;
 using InfoReaderPlugin.Command.Tools;
+using InfoReaderPlugin.ExpressionParser;
 using InfoReaderPlugin.I18n;
+using InfoReaderPlugin.RegexExpressionMatcher;
 using InfoReaderPlugin.StatusMmfPair;
 using osuTools.Game;
 using osuTools.MD5Tools;
@@ -26,11 +28,20 @@ namespace InfoReaderPlugin
 
 {
     [SyncSoftRequirePlugin("RealTimePPDisplayerPlugin", "OsuRTDataProviderPlugin")]
-    [InfoReaderVersion("1.0.19")]
+    [InfoReaderVersion("1.0.20")]
     public partial class InfoReader : Sync.Plugins.Plugin
     {
         //osuTools.Online.OnlineBestResultCollection best = new osuTools.Online.OnlineBestResultCollection();
         string _fileFormat;
+
+        public Dictionary<ExpressionTypes, ExpressionMatcherBase> ExpressionMatchers { get; } =
+            new Dictionary<ExpressionTypes, ExpressionMatcherBase>
+            {
+                {ExpressionTypes.Builtin | ExpressionTypes.Variable, new ValueMatcher()},
+                {ExpressionTypes.Builtin | ExpressionTypes.If, new IfMatcher()}
+            };
+
+
         internal static readonly List<VariablePropertyInfo> VariablePropertyInfos = new List<VariablePropertyInfo>();
         public OrtdpWrapper GetOrtdp() => _ortdpWrapper;
         public RtppdInfo GetRtppi() => _rtppdInfo;
@@ -81,6 +92,8 @@ namespace InfoReaderPlugin
         public InfoReader() : base(PLUGIN_NAME, PLUGIN_AUTHOR)
         {
             InitializeLanguage();
+            CurrentStatusMmf = new UnknownStatusMmf();
+            Command.CommandClasses.Config.UpdateMmfList(this, null);
             ScanCommand();
             CheckRtppd();
             /*if(!File.Exists("bass.dll"))

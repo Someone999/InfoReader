@@ -26,6 +26,7 @@ namespace InfoReaderPlugin.Command.CommandClasses
                     IO.CurrentIO.Write("Message loop on window MemFileMapFormat started.");
                 Thread th = new Thread(() =>
                 {
+                    _formatWindow.OnSaved += () => UpdateMmfList(instance, parser);
                     System.Windows.Forms.Application.Run(_formatWindow);
                 });
                 th.Start();
@@ -37,6 +38,25 @@ namespace InfoReaderPlugin.Command.CommandClasses
                 IO.CurrentIO.Write("Message loop on window MemFileMapFormat is running. Showing window...");
             _formatWindow.Show();
             return true;
+        }
+
+        internal static void UpdateMmfList(InfoReader instance, CommandParser parser)
+        {
+            bool debugMode = instance.Setting.DebugMode.ToBool();
+            if (debugMode)
+                IO.CurrentIO.Write("[InfoReader] Mmf format has been refreshed.");
+            foreach (var instanceExpressionMatcher in instance.ExpressionMatchers)
+            {
+                var matcher = instanceExpressionMatcher.Value;
+                matcher.Match(instance.CurrentStatusMmf.FormatString);
+
+                if (debugMode)
+                {
+                    IO.CurrentIO.Write($"Current Matcher: {matcher.GetType().Name}\nMatched count: {matcher.Results.Length}\n" +
+                                       $"Current Status: {instance.CurrentStatusMmf.TargetStatus}\n",time:false);
+                }
+            }
+
         }
     }
 }

@@ -9,6 +9,7 @@ using InfoReaderPlugin.Attribute;
 using InfoReaderPlugin.Command.CommandClasses;
 using InfoReaderPlugin.I18n;
 using osuTools.Attributes;
+using osuTools.OrtdpWrapper;
 using Sync.Plugins;
 using Sync.Tools;
 
@@ -19,6 +20,7 @@ namespace InfoReaderPlugin
         void Init(PluginEvents.InitPluginEvent e)
         {
         }
+
         void Loaded(PluginEvents.LoadCompleteEvent e)
         {
             var ortdp = getHoster().EnumPluings().FirstOrDefault(p => p.Name == "OsuRTDataProvider");
@@ -32,98 +34,67 @@ namespace InfoReaderPlugin
                     _rtppdInfo = new RtppdInfo();
                     if (_rtppdInfo != null)
                     {
-                        _ortdpWrapper = new osuTools.OrtdpWrapper.OrtdpWrapper(ortdp as OsuRTDataProvider.OsuRTDataProviderPlugin, r, _rtppdInfo);
+                        _ortdpWrapper =
+                            new OrtdpWrapper(ortdp as OsuRTDataProvider.OsuRTDataProviderPlugin,
+                                r, _rtppdInfo);
                         IO.CurrentIO.Write(NI18n.GetLanguageElement("LANG_INFO_INITSUC"));
                     }
                 }
+
                 var process = System.Diagnostics.Process.GetCurrentProcess();
                 var curdir = process.MainModule?.FileName.Replace("Sync.exe", "plugins");
-                Environment.CurrentDirectory = curdir??"";
-                GetAvaProperties(_ortdpWrapper);
+                Environment.CurrentDirectory = curdir ?? "";
+                GetAvaProp(_ortdpWrapper.GetType());
             }
             catch (NullReferenceException ex)
             {
                 IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_INFO_INITFAILED") + ex, ConsoleColor.Red);
             }
+
             ThreadPool.QueueUserWorkItem(state => ConigFileWatcher());
             ThreadPool.QueueUserWorkItem(state => RefreshMmf());
             Task.Run(() => Update.CheckUpdate());
         }
 
-        private void GetAvaProperties(object obj)
+
+        static void GetAvaProp(Type t)
         {
-            
-            if (obj is null)
-                return;
-           
-            var properties = obj.GetType().GetProperties();
-            foreach (var property in properties)
+            Assembly osuToolsAssembly = t.Assembly;
+            var properties = t.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            SpecialDictionary<PropertyInfo, AvailableVariableAttribute> avaVarAttrs =
+                new SpecialDictionary<PropertyInfo, AvailableVariableAttribute>();
+            properties = (from p in properties where 
+                    avaVarAttrs.AddAndReturn(p,p.GetCustomAttribute<AvailableVariableAttribute>(),false).Value != null 
+                    select p).ToArray();
+            foreach (var propertyInfo in properties)
             {
-                try
+                var avaAttr = avaVarAttrs[propertyInfo];
+                if (propertyInfo.PropertyType.Assembly == osuToolsAssembly)
                 {
-                    List<AliasAttribute> aliasAttrs =
-                        new List<AliasAttribute>(property.GetCustomAttributes<AliasAttribute>());
-                    List<AvailableVariableAttribute> avaAttrs =
-                        new List<AvailableVariableAttribute>(property
-                            .GetCustomAttributes<AvailableVariableAttribute>());
-                    if (aliasAttrs.Count != 0 || avaAttrs.Count != 0)
-                    {
-                        aliasAttrs.ForEach((attribute) =>
-                        {
-                            try
-                            {
-                                if(VariablePropertyInfos.All(info => info.Alias != attribute.Alias))
-                                    VariablePropertyInfos.Add(new VariablePropertyInfo(attribute.Alias,avaAttrs[0].VariableName,property,obj));
-                            }
-                            catch (Exception)
-                            {
-                                // ignore
-                            }
-                        });
-                        avaAttrs.ForEach(attribute =>
-                        {
-                            try
-                            {
-                                if (!VariablePropertyInfos.Any((info => info.Alias == attribute.VariableName)))
-                                    VariablePropertyInfos.Add(new VariablePropertyInfo(attribute.VariableName,attribute.VariableName, property, obj));
-                                if(VariablePropertyInfos.All(info => info.Alias != property.Name))
-                                    VariablePropertyInfos.Add(new VariablePropertyInfo(attribute.VariableName,attribute.VariableName, property, obj));
-                            }
-                            catch (Exception)
-                            {
-                                // ignored
-                            }
-                        });
-                        if (avaAttrs.Count > 0)
-                        {
-                            try
-                            {
-                                GetAvaProperties(property.GetValue(obj));
-                            }
-                            catch (NullReferenceException)
-                            {
-                                // ignored
-                            }
-                            catch (ArgumentException)
-                            {
-                                // ignored
-                            }
-                            catch(TargetInvocationException)
-                            {
-                                // ignored
-                            }
-
-                            
-                        }
-
-                    }
+                    GetAvaProp(propertyInfo.PropertyType);
                 }
-                catch (Exception e)
+                VariablePropertyInfos.Add(new VariablePropertyInfo(avaAttr.VariableName,
+                    avaAttr.VariableName, propertyInfo));
+                if (!avaAttr.HasAlias) 
+                    continue;
+                foreach (var aliasAttribute in avaAttr.Alias)
                 {
-                    Console.WriteLine(e);
+                    if (aliasAttribute == avaAttr .VariableName) 
+                        continue;
+                    VariablePropertyInfos.Add(new VariablePropertyInfo(aliasAttribute,
+                        avaAttr.VariableName, propertyInfo));
                 }
             }
+        }
+    }
 
+    class SpecialDictionary<TKey,TValue> : Dictionary<TKey,TValue> where TValue: class
+    {
+        public KeyValuePair<TKey,TValue> AddAndReturn(TKey key,TValue value, bool addNullValue)
+        {
+            if(addNullValue || !(value is null))
+               Add(key,value);
+            return new KeyValuePair<TKey, TValue>(key, value);
         }
     }
 }

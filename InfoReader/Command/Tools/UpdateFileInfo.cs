@@ -32,6 +32,8 @@ namespace InfoReaderPlugin.Command.Tools
             {
                 FriendlyName = jobj["FriendlyName"].ToString();
                 FileName = jobj["FileName"].ToString();
+                if (FileName.StartsWith("/"))
+                    FileName = FileName.Substring(1);
                 DownloadPath = jobj["DownloadPath"].ToString();
                 Md5 = jobj["Md5Hash"].ToString();
             }

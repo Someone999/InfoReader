@@ -13,18 +13,29 @@ namespace InfoReaderPlugin.Command.Tools
     {
         public static bool IsLatestVersion() => PluginVersion.CurrentVersion >= PluginVersion.LatestVersion;
 
-        public static void DownloadFiles(PluginVersion version)
+        public static void DownloadFiles(PluginVersion version ,out int fileCount,DownloaderEventHandlerCollection handlers = null)
         {
-            
-            Downloader downloader = new Downloader(Update.PluginServerUrl);
-            var files = UpdateFileInfo.GetFiles(version);
-            int fileCount = files.Length;
-            for (int i = 0;i<files.Length;i++)
+            bool failed = false;
+            DownloadFailedEventHandler failIsNull = (fileName, err, exp) => failed = true;
+            DownloadFailedEventHandler failedIsNotNull = (fileName, err, exp) =>
             {
-                var updateFileInfo = files[i];
-                IO.CurrentIO.Write(string.Format(NI18n.GetLanguageElement("LANG_INFO_DOWNLOAD"),updateFileInfo.FriendlyName) + $" ({i + 1}/{fileCount})");
+                failed = true;
+                handlers.FailedEventHandler(fileName, err, exp);
+            };
+            Downloader downloader = new Downloader(InfoReaderUrl.BaseUrl /*This argument is NOT used here*/);
+            downloader.OnProgressChanged += handlers?.DownloadProgressChangedEventHandler;
+            downloader.OnDownloadFailed += handlers?.FailedEventHandler is null ? failIsNull : failedIsNotNull;
+            downloader.OnDownloadCompleted += handlers?.CompletedEventHandler;
+
+            var files = UpdateFileInfo.GetFiles(version);
+            fileCount = files.Length;
+            foreach (var updateFileInfo in files)
+            {
+                if (failed)
+                {
+                    break;
+                }
                 updateFileInfo.Download(version, downloader);
-                IO.CurrentIO.Write(NI18n.GetLanguageElement("LANG_INFO_DOWNLOADED"));
             }
         }
     }

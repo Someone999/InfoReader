@@ -5,8 +5,13 @@ using InfoReaderPlugin.I18n;
 
 namespace InfoReaderPlugin
 {
+    public delegate void MmfSaved();
+
+    public delegate void MmfLoaded();
     public partial class MemFileMapFormat : Form
     {
+        public MmfSaved OnSaved;
+        public MmfLoaded OnFormatLoaded;
         public MemFileMapFormat()
         {
             InitializeComponent();
@@ -41,6 +46,7 @@ namespace InfoReaderPlugin
             tx_matchSet.Text = File.ReadAllText("FormatInfo\\MatchSetupFormatConfig.ini");
             tx_idle.Text = File.ReadAllText("FormatInfo\\IdleFormatConfig.ini");
             tx_editing.Text = File.ReadAllText("FormatInfo\\EditingFormatConfig.ini");
+            OnFormatLoaded?.Invoke();
         }
 
         private void Button1_Click(object sender, EventArgs e)
@@ -56,6 +62,7 @@ namespace InfoReaderPlugin
             File.WriteAllText("FormatInfo\\MatchSetupFormatConfig.ini", tx_matchSet.Text);
             File.WriteAllText("FormatInfo\\IdleFormatConfig.ini", tx_idle.Text);
             File.WriteAllText("FormatInfo\\EditingFormatConfig.ini", tx_editing.Text);
+            OnSaved?.Invoke();
         }
 
         private void Button2_Click(object sender, EventArgs e)

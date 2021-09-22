@@ -40,7 +40,7 @@ namespace InfoReaderPlugin.Command.CommandClasses
                         if (s == "yes")
                         {
                             instance.Setting.AutoUpdate = "False";
-                            UpdateHelper.DownloadFiles(p);
+                            UpdateHelper.DownloadFiles(p,out _);
                         }
                         IO.CurrentIO.Write(NI18n.GetLanguageElement("LANG_INFO_NEEDTORESTART"));
                         return true;

@@ -13,14 +13,17 @@ using Sync.Tools;
 
 namespace InfoReaderPlugin.Command.Tools
 {
+    public delegate void DownloadFailedEventHandler(string fileName, string error, Exception exception);
+    public delegate void DownloadCompletedEventHandler(string fileName);
     public class Downloader
     {
         private string _baseUrl;
         public HttpWebRequest Request { get; private set; }
-        public delegate double ProgressChangedEventHandler(double progress);
+        
 
-        public event ProgressChangedEventHandler OnProgressChanged;
-
+        public event DownloadProgressChangedEventHandler OnProgressChanged;
+        public event DownloadFailedEventHandler OnDownloadFailed;
+        public event DownloadCompletedEventHandler OnDownloadCompleted;
         static bool Verify(byte[] fileBytes, string md5) => string.IsNullOrEmpty(md5) ||
                                                             MD5String.GetString(MD5.Create().ComputeHash(fileBytes)) == md5;
         
@@ -53,7 +56,7 @@ namespace InfoReaderPlugin.Command.Tools
                     while ((readLen = responseStream.Read(buffer, 0, 8192)) != 0)
                     {
                         currentLen += readLen;
-                        OnProgressChanged?.Invoke(currentLen / len);
+                        OnProgressChanged?.Invoke(fileName ,currentLen / len);
                         tempStream.Write(buffer, 0, readLen);
                     }
 
@@ -70,6 +73,8 @@ namespace InfoReaderPlugin.Command.Tools
                     {
                         fstream.Close();
                         File.Delete(fileNameNew);
+                        OnDownloadFailed?.Invoke(localFileName,
+                            string.Format(NI18n.GetLanguageElement("LANG_ERR_VERIFYFAILED"), localFileName), null);
                         IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_ERR_VERIFYFAILED"), ConsoleColor.Red);
                     }
                     else
@@ -78,11 +83,13 @@ namespace InfoReaderPlugin.Command.Tools
                         fstream.Close();
                         File.Delete(localFileName);
                         File.Move(fileNameNew, localFileName);
+                        OnDownloadCompleted?.Invoke(localFileName);
                     }
                 }
             }
             catch (Exception e)
             {
+                OnDownloadFailed?.Invoke(localFileName, e.Message, e);
                 Console.WriteLine(NI18n.GetLanguageElement("LANG_ERR_DOWNLOADFAILED"), "\n" + e);
                 throw;
             }

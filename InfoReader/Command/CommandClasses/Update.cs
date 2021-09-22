@@ -18,7 +18,7 @@ namespace InfoReaderPlugin.Command.CommandClasses
                 IO.CurrentIO.Write(NI18n.GetLanguageElement("LANG_INFO_CHECKUPDATE"));
                 if (!UpdateHelper.IsLatestVersion() || forced)
                 {
-                    UpdateHelper.DownloadFiles(PluginVersion.LatestVersion);
+                    UpdateHelper.DownloadFiles(PluginVersion.LatestVersion, out _);
                     IO.CurrentIO.Write(NI18n.GetLanguageElement("LANG_INFO_UPDATED"));
                     IO.CurrentIO.Write(NI18n.GetLanguageElement("LANG_INFO_NEEDTORESTART"));
                 }

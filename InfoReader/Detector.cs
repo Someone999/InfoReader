@@ -21,9 +21,9 @@ namespace InfoReaderPlugin
                     {
                         var lastMmf = CurrentStatusMmf;
                         var currentMmf = StatusMmf.GetMmfByStatus(_ortdpWrapper.CurrentStatus);
-                        lastMmf?.OnMmfChanged(lastMmf,currentMmf);
-                        
+                        lastMmf?.OnMmfChanged(lastMmf, currentMmf);
                         CurrentStatusMmf = currentMmf;
+                        Command.CommandClasses.Config.UpdateMmfList(this, null);
                         _lastMmfStatus = _ortdpWrapper.CurrentStatus;
                     }
                     _fileFormat = CurrentStatusMmf?.FormatString ?? "";
