@@ -88,7 +88,6 @@ namespace InfoReaderPlugin.Command.CommandClasses
                             .Equals("True", StringComparison.OrdinalIgnoreCase))
                         {
                             IO.CurrentIO.WriteColor($"Injected in {s.ElapsedMilliseconds} ms", ConsoleColor.DarkGreen);
-                            //之前这个return漏掉了
                             return true;
                         }
 
