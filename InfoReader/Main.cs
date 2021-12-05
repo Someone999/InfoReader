@@ -31,7 +31,7 @@ namespace InfoReaderPlugin
     [InfoReaderVersion("1.0.20")]
     public partial class InfoReader : Sync.Plugins.Plugin
     {
-        //osuTools.Online.OnlineBestResultCollection best = new osuTools.Online.OnlineBestResultCollection();
+        osuTools.OnlineInfo.OsuApiV1.OnlineQueries.OnlineBestRecordCollection best = new osuTools.OnlineInfo.OsuApiV1.OnlineQueries.OnlineBestRecordCollection();
         string _fileFormat;
 
         public Dictionary<ExpressionTypes, ExpressionMatcherBase> ExpressionMatchers { get; } =
@@ -104,13 +104,23 @@ namespace InfoReaderPlugin
             EventBus.BindEvent<PluginEvents.InitCommandEvent>(CommandInit);
             PluginConfigurationManager manager = new Sync.Tools.PluginConfigurationManager(this);
             manager.AddItem(Setting);
+           
         }
+
+        void ConfigFileVarNameUpdater()
+        {
+            
+
+
+        }
+
+        
         public override void OnExit()
         {
             if(File.Exists("bass.dll"))
                 File.Delete("bass.dll");
         }
-
+        
         private void CheckDatabase()
         {
             if(!File.Exists("InfoReader.db"))

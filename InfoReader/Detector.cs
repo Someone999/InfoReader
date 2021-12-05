@@ -2,14 +2,43 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq.Expressions;
+using System.Runtime.InteropServices;
 using System.Threading;
+using InfoReaderPlugin.Command.CommandClasses;
 using InfoReaderPlugin.StatusMmfPair;
+using osuTools.GameInfo;
 using Sync.Tools;
 
 namespace InfoReaderPlugin
 {
     partial class InfoReader
     {
+        [DllImport("kernel32")]
+        static extern bool GetExitCodeProcess(IntPtr hProcess, out int exitCode);
+        private void GameExitCodeDetector()
+        {
+            OsuInfo info = null;
+            Process osuProcess = null;
+            while (info?.CurrentProcess is null)
+            {
+                Thread.Sleep(3000);
+                info = new OsuInfo();
+                osuProcess = info.CurrentProcess;
+            }
+            IO.CurrentIO.WriteColor("Found osu! process", ConsoleColor.Yellow);
+            osuProcess.WaitForExit();
+            int? mayBeCode = null;
+            int code;
+            if (GetExitCodeProcess(osuProcess.Handle, out code))
+            {
+                mayBeCode = code;
+                if (code != 0)
+                    IO.CurrentIO.WriteColor($"Process exited abnormally. Exit code: 0x{code:x8}", ConsoleColor.Red);
+            }
+            if (mayBeCode == null)
+                IO.CurrentIO.WriteColor($"Can not get exit code of osu!", ConsoleColor.Red);
+        }
+
         private void ConigFileWatcher()
         {
             while (true)
@@ -31,24 +60,23 @@ namespace InfoReaderPlugin
                     _ortdpWrapper.BeatmapReadMethod =
                         (osuTools.OrtdpWrapper.OrtdpWrapper.BeatmapReadMethods) Enum.Parse(
                             typeof(osuTools.OrtdpWrapper.OrtdpWrapper.BeatmapReadMethods), Setting.BeatmapReadMethod);
-                    if (string.IsNullOrEmpty(Setting.GameDir))
+                    if (!string.IsNullOrEmpty(Setting.GameDir)) 
+                        continue;
+                    Process[] processes = Process.GetProcessesByName("osu!");
+                    if (processes.Length != 0)
                     {
-                        Process[] processes = Process.GetProcessesByName("osu!");
-                        if (processes.Length != 0)
+                        var path = Path.GetDirectoryName(processes[0].MainModule?.FileName);
+                        if (string.IsNullOrEmpty(path))
+                            IO.CurrentIO.WriteColor("Can not get osu! path! Please insert it manually.",
+                                ConsoleColor.Yellow);
+                        else
                         {
-                            var path = Path.GetDirectoryName(processes[0].MainModule?.FileName);
-                            if (string.IsNullOrEmpty(path))
-                                IO.CurrentIO.WriteColor("Can not get osu! path! Please insert it manually.",
-                                    ConsoleColor.Yellow);
+                            if (File.Exists(Path.Combine(path, $"osu!.{Environment.UserName}.cfg")))
+                                Setting.GameDir = processes[0].MainModule.FileName;
                             else
                             {
-                                if (File.Exists(Path.Combine(path, $"osu!.{Environment.UserName}.cfg")))
-                                    Setting.GameDir = processes[0].MainModule.FileName;
-                                else
-                                {
-                                    IO.CurrentIO.WriteColor("Can not get osu! path! Please insert it manually.",
-                                        ConsoleColor.Yellow);
-                                }
+                                IO.CurrentIO.WriteColor("Can not get osu! path! Please insert it manually.",
+                                    ConsoleColor.Yellow);
                             }
                         }
                     }

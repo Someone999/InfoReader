@@ -5,6 +5,7 @@ using Sync.Tools;
 
 namespace InfoReaderPlugin
 {
+    using InfoReaderPlugin.NewExpressionParser.Tools;
     using System;
     using System.Text;
     using System.Text.RegularExpressions;
@@ -13,13 +14,14 @@ namespace InfoReaderPlugin
     {
         StringBuilder _rawFormat;
         string _replaceStr = "";
-        string _matchedValue;
+        
         private readonly System.IO.MemoryMappedFiles.MemoryMappedFile _outputInfoMap;
         private System.IO.Stream _outputMapStream;
         void RefreshMmf()
         {
             while (true)
             {
+                string matchedValue;
                 Thread.Sleep(5);
                 _outputMapStream = CurrentStatusMmf?.StreamOfMappedFile;
                 if(CurrentStatusMmf is null || !CurrentStatusMmf.EnableOutput)
@@ -41,14 +43,23 @@ namespace InfoReaderPlugin
                         {
                             try
                             {
-                                _matchedValue = match;
+                                /*_matchedValue = match;
                                 VariableExpression expression = new VariableExpression(_matchedValue, _ortdpWrapper);
 
                                 _replaceStr = ExpressionTools.CalcRpnExpression(
                                     ExpressionTools.ConvertToRpnExpression(expression.NoFormatExpression), _ortdpWrapper);
                                 if (expression.HasFormat)
                                     if (double.TryParse(_replaceStr, out double val))
-                                        _replaceStr = val.ToString(expression.Format);
+                                        _replaceStr = val.ToString(expression.Format);*/
+
+                                matchedValue = match.Trim('$', '{', '}');
+                                string format = "";
+                                string[] part = matchedValue.Split(':');
+                                if (part.Length > 1)
+                                    format = part[1];
+                                var rpnExp = RpnTools.ToRpnExpression(part[0]);
+                                _replaceStr = RpnTools.CalcRpnStack(rpnExp,_ortdpWrapper).ToString(format);
+                                rpnExp.Clear();
                                 if (_rawFormat.ToString().Contains("\n") || _rawFormat.ToString().Contains("\r"))
                                 {
                                     _rawFormat.Replace("\n", "\n");
@@ -76,8 +87,8 @@ namespace InfoReaderPlugin
                         {
                             try
                             {
-                                _matchedValue = match;
-                                IfExpression expression = new IfExpression(_matchedValue, _ortdpWrapper);
+                                matchedValue = match;
+                                IfExpression expression = new IfExpression(matchedValue, _ortdpWrapper);
                                 _replaceStr = expression.GetProcessedValue().ToString();
                                 if (_rawFormat.ToString().Contains("\n") || _rawFormat.ToString().Contains("\r"))
                                 {

@@ -76,7 +76,6 @@ namespace InfoReaderPlugin.Command.CommandClasses
                 Stopwatch s = new Stopwatch();
                 if (res)
                 {
-                    
                     s.Start();
                     while (s.Elapsed.TotalSeconds < 10)
                     {
@@ -118,11 +117,9 @@ namespace InfoReaderPlugin.Command.CommandClasses
                             IO.CurrentIO.WriteColor($"Injected in {s.ElapsedMilliseconds} ms", ConsoleColor.DarkGreen);
                         }
                     }
-                    //IO.CurrentIO.WriteColor(NI18n.GetLanguageElement("LANG_INFO_INJECTED"), ConsoleColor.DarkGreen);
-                   
+                    //之前这个return漏掉了
                     return true;
                 }
-
                 string msg = NI18n.GetLanguageElement("LANG_INJECTIONFAILED");
                 msg += $"({WinAPI.ErrorHandle.GetLastError()}),{WinAPI.ErrorHandle.GetErrorString(WinAPI.ErrorHandle.FormatMessageFlags.FromSystem)}";
                 IO.CurrentIO.WriteColor(msg, ConsoleColor.Red);

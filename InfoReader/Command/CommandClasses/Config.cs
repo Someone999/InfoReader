@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Remoting.Channels;
+using System.Text;
 using System.Threading;
 using InfoReaderPlugin.I18n;
 using Sync.Tools;
@@ -45,6 +46,7 @@ namespace InfoReaderPlugin.Command.CommandClasses
             bool debugMode = instance.Setting.DebugMode.ToBool();
             if (debugMode)
                 IO.CurrentIO.Write("[InfoReader] Mmf format has been refreshed.");
+            StringBuilder info = new StringBuilder();
             foreach (var instanceExpressionMatcher in instance.ExpressionMatchers)
             {
                 var matcher = instanceExpressionMatcher.Value;
@@ -52,10 +54,12 @@ namespace InfoReaderPlugin.Command.CommandClasses
 
                 if (debugMode)
                 {
-                    IO.CurrentIO.Write($"Current Matcher: {matcher.GetType().Name}\nMatched count: {matcher.Results.Length}\n" +
-                                       $"Current Status: {instance.CurrentStatusMmf.TargetStatus}\n",time:false);
+                    info.Append($"Current Matcher: {matcher.GetType().Name}\nMatched count: {matcher.Results.Length}\n" +
+                                       $"Current Status: {instance.CurrentStatusMmf.TargetStatus}\n");
+                    IO.CurrentIO.Write(info.ToString());
                 }
             }
+            
 
         }
     }

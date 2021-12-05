@@ -58,7 +58,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>F:\sync app\Plugins\OsuRTDataProvider.dll</HintPath>
     </Reference>
-    <Reference Include="osuTools, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="osuTools, Version=1.0.0.5, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\osuTools\osuTools\bin\Debug\osuTools.dll</HintPath>
     </Reference>
@@ -159,6 +159,17 @@
     <Compile Include="InfoReaderEvents.cs" />
     <Compile Include="Attribute\InfoReaderVersionAttribute.cs" />
     <Compile Include="MySqlDatabaseInfo.cs" />
+    <Compile Include="NewExpressionParser\Nodes\BoolExpressionNode.cs" />
+    <Compile Include="NewExpressionParser\Nodes\ExpressionNode.cs" />
+    <Compile Include="NewExpressionParser\Nodes\ExpressionNodeType.cs" />
+    <Compile Include="NewExpressionParser\Nodes\FunctionNode.cs" />
+    <Compile Include="NewExpressionParser\Nodes\IdentifierNode.cs" />
+    <Compile Include="NewExpressionParser\Nodes\NumberExpressionNode.cs" />
+    <Compile Include="NewExpressionParser\Nodes\OperatorExpressionNode.cs" />
+    <Compile Include="NewExpressionParser\Nodes\StringExpressionNode.cs" />
+    <Compile Include="NewExpressionParser\Nodes\ValueExpressionNode.cs" />
+    <Compile Include="NewExpressionParser\Tools\RpnTools.cs" />
+    <Compile Include="NewExpressionParser\Tools\ValueGettingHelper.cs" />
     <Compile Include="PluginVersion.cs" />
     <Compile Include="RegexExpressionMatcher\ExpressionMatcherBase.cs" />
     <Compile Include="RegexExpressionMatcher\FunctionMatcher.cs" />
@@ -246,7 +257,7 @@
   </PropertyGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties Reactor_Deploy="0" Reactor_Output="" Reactor_Configuration="ALL" Reactor_Project="" Reactor_Commands="" Reactor_Enabled="0" />
+      <UserProperties Reactor_Enabled="0" Reactor_Commands="" Reactor_Project="" Reactor_Configuration="ALL" Reactor_Output="" Reactor_Deploy="0" />
     </VisualStudio>
   </ProjectExtensions>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

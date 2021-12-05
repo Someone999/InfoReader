@@ -129,9 +129,9 @@ namespace InfoReaderPlugin.Command.CommandClasses
         string GetName(string folder,IBeatmap beatmap,string extension)
         {
             if (string.IsNullOrEmpty(folder))
-                throw new ArgumentException("文件夹名不能为空");
+                throw new ArgumentException("Folder name can not be null or empty.");
             if (beatmap is null)
-                throw new ArgumentNullException(nameof(beatmap),"谱面不能为null");
+                throw new ArgumentNullException(nameof(beatmap),"Beatmap can not be null.");
             string beatmapFolder = $"{beatmap.Artist} - {beatmap.Title}";
             folder = Path.Combine(folder, beatmapFolder);
             TryCreateDirectory(folder);

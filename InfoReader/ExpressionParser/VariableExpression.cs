@@ -79,6 +79,7 @@ namespace InfoReaderPlugin.ExpressionParser
                         CurrentProperty = pro;
                         t = pro.GetValue(t);
                         match++;
+                        continue;
                     }
                 }
             }

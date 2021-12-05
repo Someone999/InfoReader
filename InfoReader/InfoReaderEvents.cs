@@ -44,7 +44,7 @@ namespace InfoReaderPlugin
                 var process = System.Diagnostics.Process.GetCurrentProcess();
                 var curdir = process.MainModule?.FileName.Replace("Sync.exe", "plugins");
                 Environment.CurrentDirectory = curdir ?? "";
-                GetAvaProp(_ortdpWrapper.GetType());
+                GetAvailableProperties(_ortdpWrapper.GetType());
             }
             catch (NullReferenceException ex)
             {
@@ -53,11 +53,12 @@ namespace InfoReaderPlugin
 
             ThreadPool.QueueUserWorkItem(state => ConigFileWatcher());
             ThreadPool.QueueUserWorkItem(state => RefreshMmf());
+            ThreadPool.QueueUserWorkItem(state => GameExitCodeDetector());
             Task.Run(() => Update.CheckUpdate());
         }
 
 
-        static void GetAvaProp(Type t)
+        static void GetAvailableProperties(Type t)
         {
             Assembly osuToolsAssembly = t.Assembly;
             var properties = t.GetProperties(BindingFlags.Public | BindingFlags.Instance);
@@ -71,7 +72,7 @@ namespace InfoReaderPlugin
                 var avaAttr = avaVarAttrs[propertyInfo];
                 if (propertyInfo.PropertyType.Assembly == osuToolsAssembly)
                 {
-                    GetAvaProp(propertyInfo.PropertyType);
+                    GetAvailableProperties(propertyInfo.PropertyType);
                 }
                 VariablePropertyInfos.Add(new VariablePropertyInfo(avaAttr.VariableName,
                     avaAttr.VariableName, propertyInfo));
